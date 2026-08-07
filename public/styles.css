@@ -75,6 +75,16 @@ main { padding: 22px 24px 60px; max-width: 1200px; margin: 0 auto; }
 .arrow { align-self: center; color: var(--muted); font-size: 22px; }
 .arrow.return { color: var(--gold); }
 
+/* Charts */
+.charts-row { display: flex; gap: 18px; flex-wrap: wrap; }
+.chart-box { flex: 1; min-width: 300px; }
+.chart-box.narrow { flex: 0 0 260px; min-width: 240px; }
+.chart-title { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+canvas { width: 100%; height: auto; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; }
+.legend { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.legend.wrap { flex-wrap: wrap; gap: 8px 14px; }
+.legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
 /* Guardrails */
 .guardrails { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .guardrails li {

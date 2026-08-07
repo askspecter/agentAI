@@ -35,6 +35,26 @@
         <div class="kpi"><span class="kpi-label">Card balance</span><span id="card" class="kpi-value down">$0.00</span></div>
       </section>
 
+      <!-- Live performance -->
+      <section class="card wide charts">
+        <h2>Performance <span class="hint">live · this session</span></h2>
+        <div class="charts-row">
+          <div class="chart-box">
+            <div class="chart-title">Net worth vs invested capital</div>
+            <canvas id="lineChart" width="720" height="220"></canvas>
+            <div class="legend">
+              <span><i class="sw" style="background:var(--accent)"></i>Net worth</span>
+              <span><i class="sw" style="background:#6ea8fe"></i>Invested</span>
+            </div>
+          </div>
+          <div class="chart-box narrow">
+            <div class="chart-title">Basket allocation</div>
+            <canvas id="allocChart" width="240" height="220"></canvas>
+            <div id="allocLegend" class="legend wrap"></div>
+          </div>
+        </div>
+      </section>
+
       <div class="grid">
         <!-- The flywheel loop -->
         <section class="card flywheel">
