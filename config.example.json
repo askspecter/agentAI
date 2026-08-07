@@ -1,0 +1,39 @@
+{
+  "// notes": "Copy to config.json and fill real values to leave simulation mode.",
+
+  "mode": "simulation",
+
+  "robinhood": {
+    "// tradingMcpUrl": "Paste your Robinhood Trading MCP server URL here. When present and mode != simulation, the agent routes real orders through it.",
+    "tradingMcpUrl": "",
+    "// chainRpcUrl": "Robinhood Chain (Arbitrum Orbit L2) JSON-RPC endpoint.",
+    "chainRpcUrl": "",
+    "// cardWebhookSecret": "Shared secret to verify inbound card-transaction webhooks.",
+    "cardWebhookSecret": ""
+  },
+
+  "guardrails": {
+    "roundUpMultiplier": 5,
+    "perTradeCapUsd": 50,
+    "dailyInvestCapUsd": 200,
+    "manualApprovalAboveUsd": 100,
+    "minCardBufferUsd": 25
+  },
+
+  "basket": {
+    "name": "AI Megacap",
+    "// weights": "Target weights across tokenized stocks on Robinhood Chain. Must sum to ~1.",
+    "weights": {
+      "NVDAx": 0.35,
+      "MSFTx": 0.25,
+      "GOOGLx": 0.2,
+      "AAPLx": 0.2
+    }
+  },
+
+  "defi": {
+    "// pool": "DeFi venue on Robinhood Chain where idle cash earns yield between invests.",
+    "pool": "uniswap-v4:USDCx-USDx",
+    "targetIdleYieldApy": 0.06
+  }
+}

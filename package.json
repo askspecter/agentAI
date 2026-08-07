@@ -1,0 +1,24 @@
+{
+  "name": "robinhood-spend-to-invest-flywheel",
+  "version": "0.1.0",
+  "description": "An autonomous agent on the Robinhood network that turns everyday card spending into an on-chain invest → yield → auto-repay flywheel. Runs as a web app.",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "robinhood",
+    "robinhood-chain",
+    "trading-mcp",
+    "agentic-trading",
+    "tokenized-stocks",
+    "defi",
+    "flywheel"
+  ],
+  "license": "MIT"
+}
