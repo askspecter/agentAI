@@ -29,21 +29,27 @@ All within the guardrails you set.
 
 ## Run it
 
-Zero dependencies — just Node ≥ 20.
+The whole simulation runs **client-side in the browser** — no backend needed —
+so it works on any static host (Vercel, GitHub Pages, `file://`). Just serve the
+`public/` folder:
 
 ```bash
-npm start
-# → http://localhost:3000
+# any static server works, e.g.
+npx serve public
+# or use the bundled Node server (also exposes the real-integration seams):
+npm start   # → http://localhost:3000
 ```
+
+Or deploy `public/` to Vercel / Netlify and it runs as-is.
 
 Then on the dashboard:
 
 - **Simulate purchase** — fire a single card transaction through the flywheel.
 - **Autopilot** — stream purchases automatically and watch the loop spin.
-- **Auto-repay card** — have the agent sweep the yield reserve to pay the card.
+- **Auto-repay** — have the agent sweep the yield reserve to pay down the card.
 
-The dashboard streams live over Server-Sent Events: prices move, DeFi yield
-accrues, and every agent decision is logged with a synthetic on-chain tx hash.
+Prices move every second, DeFi yield accrues, the charts animate, and every
+agent decision is logged with a synthetic on-chain tx hash.
 
 ---
 
@@ -65,18 +71,26 @@ Each round-up runs through `server/agent.js`, which:
 ## Architecture
 
 ```
-server/
-  index.js              HTTP server: REST + SSE + static UI (zero-dep)
-  flywheel.js           Orchestrates the closed loop, emits live updates
+public/                 The web app — runs standalone, no backend
+  index.html            Dashboard markup (SVG icons, no dependencies)
+  styles.css            Clean dark theme
+  app.js                UI controller + canvas charts
+  engine.js             The full flywheel simulation, in the browser
+server/                 Optional Node server for local dev + real integration
+  index.js              Static host + REST/SSE + real-integration seams
+  flywheel.js           Server-side engine (mirrors the browser one)
   agent.js              Decision logic + guardrail enforcement
   robinhood/
     mcpClient.js        Trading MCP client (real seam + sim fallback)
     chain.js            Robinhood Chain: tokenized positions + DeFi yield
     market.js           Tokenized-stock price feed
     cardFeed.js         Card purchases + round-up + webhook parser
-public/                 Live dashboard (HTML/CSS/vanilla JS over SSE)
 config.example.json     Guardrails, basket weights, integration endpoints
 ```
+
+The browser demo is powered entirely by `public/engine.js`. The `server/`
+tree keeps the same shape for wiring the **real** Robinhood Trading MCP / Chain
+when you have credentials — see the seams below.
 
 ### Going live (from simulation → real Robinhood)
 

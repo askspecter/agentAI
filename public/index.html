@@ -4,47 +4,82 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Spend-to-Invest Flywheel · Robinhood Agent</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="topbar">
       <div class="brand">
-        <span class="logo">🛞</span>
-        <div>
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-9-9" /><path d="M21 3v6h-6" /><path d="M21 3l-7.5 7.5" />
+          </svg>
+        </span>
+        <div class="brand-text">
           <h1>Spend-to-Invest Flywheel</h1>
           <p class="tagline">
-            An autonomous agent on the Robinhood network ·
-            <span id="mode" class="pill">—</span>
+            Autonomous agent on the Robinhood network
+            <span class="dot">·</span>
+            <span id="mode" class="pill">connecting</span>
           </p>
         </div>
       </div>
       <div class="controls">
-        <button id="spendBtn" class="btn">＋ Simulate purchase</button>
-        <button id="autopilotBtn" class="btn btn-primary">▶ Autopilot</button>
-        <button id="repayBtn" class="btn">💳 Auto-repay card</button>
+        <button id="spendBtn" class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+          Simulate purchase
+        </button>
+        <button id="autopilotBtn" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7 4v16l13-8z" /></svg>
+          <span class="lbl">Autopilot</span>
+        </button>
+        <button id="repayBtn" class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
+          Auto-repay
+        </button>
       </div>
     </header>
 
     <main>
-      <!-- KPI row -->
       <section class="kpis">
-        <div class="kpi"><span class="kpi-label">Net worth</span><span id="netWorth" class="kpi-value">$0.00</span></div>
-        <div class="kpi"><span class="kpi-label">Portfolio (tokenized)</span><span id="portfolio" class="kpi-value">$0.00</span></div>
-        <div class="kpi"><span class="kpi-label">DeFi reserve</span><span id="reserve" class="kpi-value">$0.00</span></div>
-        <div class="kpi"><span class="kpi-label">Yield earned</span><span id="yield" class="kpi-value up">$0.0000</span></div>
-        <div class="kpi"><span class="kpi-label">Card balance</span><span id="card" class="kpi-value down">$0.00</span></div>
+        <div class="kpi">
+          <span class="kpi-label">Flywheel value</span>
+          <span id="flywheelValue" class="kpi-value">$0.00</span>
+          <span class="kpi-sub">portfolio + reserve</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Return</span>
+          <span id="return" class="kpi-value">$0.00</span>
+          <span id="returnPct" class="kpi-sub">0.00%</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Spare change captured</span>
+          <span id="captured" class="kpi-value">$0.00</span>
+          <span class="kpi-sub">from round-ups</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Yield earned</span>
+          <span id="yield" class="kpi-value accent">$0.0000</span>
+          <span id="apy" class="kpi-sub">—</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Card offset</span>
+          <span id="offset" class="kpi-value">$0.00</span>
+          <span class="kpi-sub">auto-repaid from yield</span>
+        </div>
       </section>
 
-      <!-- Live performance -->
-      <section class="card wide charts">
-        <h2>Performance <span class="hint">live · this session</span></h2>
+      <section class="card wide">
+        <div class="card-head">
+          <h2>Performance</h2>
+          <span class="hint">live · this session</span>
+        </div>
         <div class="charts-row">
           <div class="chart-box">
-            <div class="chart-title">Net worth vs invested capital</div>
-            <canvas id="lineChart" width="720" height="220"></canvas>
+            <div class="chart-title">Flywheel value vs contributed</div>
+            <canvas id="lineChart" width="760" height="220"></canvas>
             <div class="legend">
-              <span><i class="sw" style="background:var(--accent)"></i>Net worth</span>
-              <span><i class="sw" style="background:#6ea8fe"></i>Invested</span>
+              <span><i class="sw accent"></i>Flywheel value</span>
+              <span><i class="sw blue"></i>Contributed</span>
             </div>
           </div>
           <div class="chart-box narrow">
@@ -55,52 +90,72 @@
         </div>
       </section>
 
-      <div class="grid">
-        <!-- The flywheel loop -->
-        <section class="card flywheel">
-          <h2>The loop</h2>
-          <div class="loop">
-            <div class="node" data-node="spend"><span class="ico">🛒</span><b>Spend</b><small id="fSpent">$0</small></div>
-            <div class="arrow">→</div>
-            <div class="node" data-node="roundup"><span class="ico">🔢</span><b>Round-up</b><small id="fMult">×—</small></div>
-            <div class="arrow">→</div>
-            <div class="node" data-node="invest"><span class="ico">📈</span><b>Invest</b><small id="fInvested">$0</small></div>
-            <div class="arrow">→</div>
-            <div class="node" data-node="yield"><span class="ico">🪙</span><b>DeFi yield</b><small id="fApy">—</small></div>
-            <div class="arrow return">↩</div>
-            <div class="node" data-node="repay"><span class="ico">💳</span><b>Auto-repay</b><small id="fRepaid">$0</small></div>
+      <section class="card wide">
+        <div class="card-head"><h2>The loop</h2><span class="hint">spend → invest → yield → repay</span></div>
+        <div class="loop">
+          <div class="node" data-node="spend">
+            <span class="node-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>
+            </span>
+            <b>Spend</b><small id="fSpent">$0</small>
           </div>
-        </section>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
+          <div class="node" data-node="roundup">
+            <span class="node-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14" /><path d="m18 13-6-6-6 6" /><path d="M12 7v14" /></svg>
+            </span>
+            <b>Round-up</b><small id="fMult">×—</small>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
+          <div class="node" data-node="invest">
+            <span class="node-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17" /><path d="M16 7h6v6" /></svg>
+            </span>
+            <b>Invest</b><small id="fInvested">$0</small>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
+          <div class="node" data-node="yield">
+            <span class="node-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" /><path d="M18.09 10.37A6 6 0 1 1 10.34 18" /><path d="M7 6h1v4" /><path d="m16.71 13.88.7.71-2.82 2.82" /></svg>
+            </span>
+            <b>DeFi yield</b><small id="fApy">—</small>
+          </div>
+          <div class="arrow return"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10 4 15l5 5" /><path d="M20 4v7a4 4 0 0 1-4 4H4" /></svg></div>
+          <div class="node" data-node="repay">
+            <span class="node-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><path d="M2 10h20" /></svg>
+            </span>
+            <b>Auto-repay</b><small id="fRepaid">$0</small>
+          </div>
+        </div>
+      </section>
 
-        <!-- Guardrails -->
+      <div class="grid">
         <section class="card">
-          <h2>Guardrails <span class="hint">enforced by the agent</span></h2>
+          <div class="card-head"><h2>Guardrails</h2><span class="hint">enforced by the agent</span></div>
           <ul id="guardrails" class="guardrails"></ul>
         </section>
 
-        <!-- Holdings -->
         <section class="card">
-          <h2>Tokenized-stock basket · <span id="basketName">—</span></h2>
+          <div class="card-head"><h2>Tokenized basket</h2><span id="basketName" class="hint">—</span></div>
           <table class="holdings">
             <thead><tr><th>Token</th><th>Price</th><th>Shares</th><th>Value</th></tr></thead>
             <tbody id="holdings"></tbody>
           </table>
         </section>
 
-        <!-- Approvals -->
         <section class="card">
-          <h2>Pending approvals <span class="hint">high-value deployments</span></h2>
+          <div class="card-head"><h2>Pending approvals</h2><span class="hint">high-value deployments</span></div>
           <div id="approvals" class="approvals"><p class="empty">Nothing waiting.</p></div>
         </section>
 
-        <!-- Activity -->
-        <section class="card wide">
-          <h2>Agent activity <span class="hint">every decision, on-chain</span></h2>
+        <section class="card">
+          <div class="card-head"><h2>On-chain activity</h2><span id="txCount" class="hint">0 tx</span></div>
           <ul id="log" class="log"></ul>
         </section>
       </div>
     </main>
 
-    <script src="/app.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
