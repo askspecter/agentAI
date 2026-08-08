@@ -6,7 +6,8 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js"
+    "dev": "node --watch server/index.js",
+    "build:login": "esbuild build-src/login.js --bundle --minify --format=esm --target=es2020 --define:process.env.NODE_ENV=\"production\" --loader:.css=empty --outfile=public/login-bundle.js"
   },
   "engines": {
     "node": ">=20"
@@ -20,5 +21,11 @@
     "defi",
     "flywheel"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@privy-io/react-auth": "^3.37.0",
+    "esbuild": "^0.28.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
 }
