@@ -24,13 +24,12 @@
 .card-login h1{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:-.02em}
 .card-login p.sub{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.5}
 .card-login .btn{width:100%;margin-top:22px}
-.card-login .status{color:var(--faint);font-size:13px;margin-top:16px;min-height:18px}
-.card-login .guest{display:inline-block;margin-top:18px;color:var(--muted);font-size:13.5px}
+.card-login .status{color:var(--faint);font-size:13px;margin-top:14px;min-height:18px}
+.card-login .guest{display:inline-block;margin-top:16px;color:var(--muted);font-size:13.5px}
 .card-login .guest:hover{color:var(--olive)}
 .card-login .fine{color:var(--faint);font-size:11.5px;margin-top:22px;line-height:1.5}
 .card-login .fine a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
-.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--olive);border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--olive);border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .7s linear infinite}
 </style>
 </head><body>
 <div class="wrap-login">
@@ -38,11 +37,41 @@
     <div class="mk"><img src="/olea-mark.png" alt="olea"/></div>
     <h1>Log in to olea</h1>
     <p class="sub">Continue with email or your wallet.</p>
-    <div class="status"><span class="spinner"></span>Loading secure login…</div>
+    <button id="continueBtn" class="btn btn-primary">Continue</button>
+    <div class="status" id="lstatus"></div>
     <a class="guest" href="/app">Continue as guest →</a>
+    <div class="fine">By continuing you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</div>
   </div>
 </div>
 
-<!-- Privy + React bundled into one file served from our own domain (no runtime CDN). -->
-<script type="module" src="/login-bundle.js"></script>
+<script>
+// Instant card. The heavy Privy bundle is only loaded on intent (tap), or
+// automatically for returning users and the logout flow. Keeps the page fast
+// on mobile instead of executing a large bundle on every visit.
+(function () {
+  var btn = document.getElementById("continueBtn");
+  var status = document.getElementById("lstatus");
+  var loading = false;
+  function start() {
+    if (loading) return;
+    loading = true;
+    btn.disabled = true;
+    btn.textContent = "Opening…";
+    status.innerHTML = '<span class="spinner"></span>Opening secure login…';
+    import("/login-bundle.js").catch(function (e) {
+      loading = false;
+      btn.disabled = false;
+      btn.textContent = "Try again";
+      status.textContent = "Could not load. Check your connection, or continue as guest.";
+      console.error("login bundle failed:", e);
+    });
+  }
+  btn.addEventListener("click", start);
+
+  var params = new URLSearchParams(window.location.search);
+  var returning = false;
+  try { returning = localStorage.getItem("olea_authed") === "1"; } catch (e) {}
+  if (params.has("logout") || returning) start();
+})();
+</script>
 </body></html>

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "build:login": "esbuild build-src/login.js --bundle --minify --format=esm --target=es2020 --define:process.env.NODE_ENV=\"production\" --loader:.css=empty --outfile=public/login-bundle.js"
+    "build:login": "node build-login.mjs"
   },
   "engines": {
     "node": ">=20"
