@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Flywheel — Live Agent · Robinhood network</title>
 <link rel="stylesheet" href="./pixel.css"/>
 <style>
@@ -99,8 +99,8 @@ tr:last-child td{border:none}
 .log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line)}
 @media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.wbody{grid-template-columns:1fr}.chartcol{border-right:none;border-bottom:3px solid var(--line)}.grid{grid-template-columns:1fr}.loop{flex-wrap:wrap}.arr{display:none}.step{flex:1 1 30%}}
 @media(max-width:640px){
- .top{position:static}
- .topin{height:auto;flex-direction:column;align-items:stretch;gap:12px;padding:14px 0}
+ .top{position:static;padding-top:max(18px,env(safe-area-inset-top,18px))}
+ .topin{height:auto;flex-direction:column;align-items:stretch;gap:12px;padding:6px 0 16px}
  .brand{flex-wrap:wrap}
  .ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
  .ctrls .btn{justify-content:center}
