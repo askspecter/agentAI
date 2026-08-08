@@ -2,6 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="format-detection" content="telephone=no,email=no,address=no,date=no"/>
 <title>olea · Live agent · Robinhood network</title>
 <link rel="icon" href="./favicon.png"/>
 <link rel="icon" sizes="32x32" href="./favicon-32.png"/>
@@ -14,15 +15,18 @@
 .topbar{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);
   background:rgba(10,12,8,.8);backdrop-filter:saturate(140%) blur(14px);padding-top:env(safe-area-inset-top,0px)}
 .tb-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
-.tb-brand{display:flex;align-items:center;gap:10px}
-.tb-brand img{height:26px}
-.tb-brand .name{font-weight:700;font-size:18px}
+.tb-brand{display:flex;align-items:center;gap:10px;min-width:0}
+.tb-brand img{height:26px;flex:none}
+.tb-brand .name{font-weight:700;font-size:18px;flex:none}
 .pill{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--olive);
-  border:1px solid rgba(164,181,110,.3);background:var(--olive-soft);padding:3px 9px;border-radius:999px;margin-left:6px}
-.tb-ctrls{display:flex;gap:8px;flex-wrap:wrap}
-.userchip{display:inline-flex;align-items:center;gap:8px;margin-left:8px;padding:4px 12px 4px 5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;color:var(--muted);max-width:220px}
+  border:1px solid rgba(164,181,110,.3);background:var(--olive-soft);padding:3px 9px;border-radius:999px;margin-left:6px;flex:none}
+.tb-ctrls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.userchip{display:inline-flex;align-items:center;gap:8px;margin-left:8px;padding:4px 12px 4px 5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;color:var(--muted);min-width:0;max-width:220px}
 .userchip .uava{width:22px;height:22px;border-radius:50%;background:var(--olive);color:#14180b;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;font-family:var(--display)}
-.userchip #uname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.userchip #uname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums;text-decoration:none}
+/* secondary/navigation buttons read quieter than the sim actions */
+.btn.nav{color:var(--muted);border-color:var(--line)}
+.btn.nav:hover{color:var(--text);border-color:var(--line-2)}
 .btn.on{background:var(--olive);color:#14180b;border-color:transparent}
 main{padding:22px 0 64px}
 
@@ -92,8 +96,20 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
 }
 @media(max-width:640px){
   .topbar{position:static}
-  .tb-in{height:auto;flex-direction:column;align-items:stretch;gap:12px;padding-top:12px;padding-bottom:14px}
-  .tb-ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tb-in{height:auto;flex-direction:column;align-items:stretch;gap:14px;padding-top:12px;padding-bottom:16px}
+  /* brand on its own line; identity chip drops below, full width */
+  .tb-brand{flex-wrap:wrap;gap:8px}
+  .userchip{margin-left:0;flex-basis:100%;max-width:none;padding:7px 14px 7px 6px;font-size:13.5px}
+  .userchip .uava{width:24px;height:24px}
+  /* one deliberate grid: primary action full-width, then paired actions, then nav */
+  .tb-ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    grid-template-areas:"auto auto" "spend repay" "home logout"}
+  .tb-ctrls .btn{height:44px;font-size:14.5px}
+  #btnAuto{grid-area:auto}
+  #btnSpend{grid-area:spend}
+  #btnRepay{grid-area:repay}
+  #homeBtn{grid-area:home}
+  #authBtn{grid-area:logout}
 }
 </style></head><body>
 
@@ -101,11 +117,11 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
   <div class="tb-brand"><img src="./olea-mark.png" alt="olea"/><span class="name">olea</span><span id="mode" class="pill">Simulation</span>
     <span class="userchip" id="userchip"><span class="uava" id="uava">G</span><span id="uname">Guest</span></span></div>
   <div class="tb-ctrls">
-    <a class="btn btn-sm" href="/">← Home</a>
+    <a id="homeBtn" class="btn btn-sm nav" href="/">← Home</a>
     <button id="btnSpend" class="btn btn-sm">+ Simulate purchase</button>
     <button id="btnAuto" class="btn btn-primary btn-sm">▶ Autopilot</button>
     <button id="btnRepay" class="btn btn-sm">Auto-repay</button>
-    <a id="authBtn" class="btn btn-sm" href="/login">Log in</a>
+    <a id="authBtn" class="btn btn-sm nav" href="/login">Log in</a>
   </div>
 </div></header>
 
