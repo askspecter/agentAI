@@ -1,183 +1,155 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"/>
+<html lang="en"><head>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Olea — Live Agent · Robinhood network</title>
-<link rel="stylesheet" href="./pixel.css"/>
+<title>Olea — Live agent · Robinhood network</title>
+<link rel="icon" href="./olea-mark.png"/>
+<link rel="stylesheet" href="./styles.css"/>
 <style>
-:root{
- --bg:#0b0d08; --panel:#12160d; --panel2:#171c10; --ink:#eef2e6; --dim:#93a07a; --mut:#6e7a58;
- --grn:#7f9158; --grn-d:#4a5636; --gold:#cdb46a; --pink:#c07a55; --line:#333c26; --shadow:#050603;
-}
-*{box-sizing:border-box;margin:0}
-html{image-rendering:pixelated}
-body{font-family:'VT',monospace;background:var(--bg);color:var(--ink);font-size:19px;line-height:1.35;letter-spacing:.5px;position:relative;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
-body:after{content:"";position:fixed;inset:0;z-index:99;pointer-events:none;background:radial-gradient(120% 120% at 50% 40%,transparent 62%,rgba(0,0,0,.5))}
-canvas{image-rendering:pixelated}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-a{color:inherit;text-decoration:none}
-.green{color:var(--grn)}.gold{color:var(--gold)}.pink{color:var(--pink)}
-.panel{background:var(--panel);border:3px solid var(--grn-d);box-shadow:6px 6px 0 var(--shadow);position:relative}
-.btn{font-family:'PS2P';font-size:9px;padding:11px 13px;border:3px solid #0a0f0a;cursor:pointer;background:var(--grn);color:#062412;box-shadow:4px 4px 0 var(--shadow);display:inline-flex;align-items:center;gap:7px;text-transform:uppercase}
-.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
-.btn.alt{background:var(--panel2);color:var(--grn);border-color:var(--grn-d)}
-.btn.on{background:var(--gold);color:#3a2c00}
+.topbar{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);
+  background:rgba(10,12,8,.8);backdrop-filter:saturate(140%) blur(14px);padding-top:env(safe-area-inset-top,0px)}
+.tb-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-brand img{height:26px}
+.tb-brand .name{font-weight:700;font-size:18px}
+.pill{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--olive);
+  border:1px solid rgba(164,181,110,.3);background:var(--olive-soft);padding:3px 9px;border-radius:999px;margin-left:6px}
+.tb-ctrls{display:flex;gap:8px;flex-wrap:wrap}
+.btn.on{background:var(--olive);color:#14180b;border-color:transparent}
+main{padding:22px 0 64px}
 
-/* topbar */
-.top{border-bottom:3px solid var(--line);background:#0a0f0a;position:sticky;top:0;z-index:30}
-.topin{display:flex;align-items:center;justify-content:space-between;height:70px;gap:12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px}
-.brand .ic{width:32px;height:32px;background:var(--panel2);border:3px solid var(--grn-d);display:grid;place-items:center}
-.brand .ic canvas{width:20px;height:20px}
-.brand b{font-family:'PS2P';font-size:12px}
-.brand .pill{font-family:'PS2P';font-size:7px;color:var(--gold);border:2px solid var(--grn-d);padding:4px 7px;margin-left:6px}
-.ctrls{display:flex;gap:8px;flex-wrap:wrap}
-.home{font-family:'PS2P';font-size:8px;color:var(--dim)}
-
-main{padding:22px 0 60px}
-.eyebrow{font-family:'PS2P';font-size:7px;color:var(--dim);letter-spacing:.5px;line-height:1.6}
-/* kpis */
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
-.kcard{padding:15px}
-.kval{font-size:32px;line-height:1;margin-top:9px}
-.ksub{font-size:15px;color:var(--mut);margin-top:6px}
-/* window */
-.win{margin-bottom:16px}
-.wbar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--panel2);border-bottom:3px solid var(--grn-d)}
-.wbar .l{font-family:'PS2P';font-size:9px;display:flex;gap:10px;align-items:center}
-.dots{display:flex;gap:6px}.dots i{width:11px;height:11px;display:block;border:2px solid #0a0f0a}
-.dots .r{background:var(--pink)}.dots .y{background:var(--gold)}.dots .g{background:var(--grn)}
-.wbody{display:grid;grid-template-columns:1.55fr 1fr}
-.chartcol{padding:20px;border-right:3px solid var(--line)}
-.chartcol .lab{font-family:'PS2P';font-size:8px;color:var(--dim)}
-.chartcol .big{font-size:50px;line-height:.9;margin-top:10px}
-.chartcol .up{font-size:18px;margin-top:6px}
-#barCanvas{width:100%;height:170px;margin-top:14px;display:block}
-.alloccol{padding:18px 20px}
-.alloccol h4{font-family:'PS2P';font-size:8px;color:var(--dim);margin-bottom:14px}
-.arow{margin-bottom:12px}
-.arow .t{display:flex;justify-content:space-between;font-size:16px;margin-bottom:4px}
-.abar{height:14px;background:#0c150c;border:2px solid var(--line)}
-.abar span{display:block;height:100%;background:var(--grn)}
+.kcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.kcard .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.kcard .v{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:8px}
+.kcard .s{color:var(--faint);font-size:12.5px;margin-top:4px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.p-head h2{font-size:15px;font-weight:700}
+.p-head .hint{color:var(--faint);font-size:12.5px}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--olive)}
+.live .d{width:7px;height:7px;border-radius:50%;background:var(--olive);box-shadow:0 0 8px var(--olive)}
+
+.row1{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+.ov-body{padding:22px}
+.ov-lab{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.ov-val{font-size:40px;font-weight:700;letter-spacing:-.02em;margin-top:8px}
+.ov-delta{font-size:14px;margin-top:5px}
+#lineCanvas{width:100%;height:180px;display:block;margin-top:12px}
+.alloc-body{padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+#allocCanvas{width:190px;height:190px}
+.alloc-legend{width:100%;display:grid;gap:8px}
+.alloc-legend .r{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+.alloc-legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:8px;vertical-align:middle}
+
 /* loop */
-.loopcard{padding:20px}
-.loop{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.loop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:22px}
 .step{flex:1;text-align:center}
-.tile{width:60px;height:60px;margin:0 auto;background:var(--panel2);border:3px solid var(--grn-d);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center;color:var(--grn);transition:transform .1s}
-.tile svg{width:26px;height:26px;shape-rendering:crispEdges}
-.tile.flash{background:var(--grn);color:#062412;transform:translateY(-3px)}
-.step h3{font-family:'PS2P';font-size:8px;margin-top:12px}
-.step small{display:block;color:var(--gold);font-size:15px;margin-top:5px}
-.arr{align-self:center;font-family:'PS2P';color:var(--grn);font-size:12px;margin-top:16px;opacity:.6}
-/* grid bottom */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.pad{padding:18px}
-.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.head h2{font-family:'PS2P';font-size:10px}
-.head .hint{font-family:'PS2P';font-size:7px;color:var(--dim)}
+.tile{width:52px;height:52px;margin:0 auto;border-radius:13px;display:grid;place-items:center;color:var(--olive);
+  background:var(--olive-soft);border:1px solid rgba(164,181,110,.22);transition:transform .12s,background .12s,color .12s}
+.tile svg{width:22px;height:22px}
+.tile.flash{background:var(--olive);color:#14180b;transform:translateY(-3px)}
+.step h4{font-size:13px;font-weight:700;margin-top:11px}
+.step small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.arr{align-self:center;color:var(--faint)}.arr svg{width:18px;height:18px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.pad{padding:20px}
 .guard{list-style:none;padding:0;margin:0}
-.guard li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:2px solid var(--line);color:var(--dim);font-size:17px}
-.guard li:last-child{border:none}
-.guard b{color:var(--ink)}
-table{width:100%;border-collapse:collapse;font-size:16px}
-th{text-align:right;font-family:'PS2P';font-size:7px;color:var(--dim);font-weight:400;padding:0 4px 12px;border-bottom:2px solid var(--line)}
+.guard li{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);color:var(--muted);font-size:14px}
+.guard li:last-child{border:none}.guard b{color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:right;color:var(--faint);font-weight:500;padding:0 4px 12px;border-bottom:1px solid var(--line)}
 th:first-child,td:first-child{text-align:left}
-td{text-align:right;padding:9px 4px;border-bottom:2px solid #14201480}
-tr:last-child td{border:none}
-.tk{color:var(--grn)}
-.approvals .empty,.log .empty{color:var(--mut);font-size:16px}
-.appr{border:2px solid var(--gold);padding:12px;margin-bottom:10px}
-.appr p{font-size:16px;margin-bottom:10px}
-.appr .row{display:flex;gap:8px}
-.log{list-style:none;padding:0;margin:0;max-height:280px;overflow-y:auto}
-.log li{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:center;padding:8px 0;border-bottom:2px solid #14201466;font-size:15px}
-.log .d{width:8px;height:8px}
-.log .spend .d{background:var(--pink)}.log .invest .d{background:var(--grn)}.log .defi .d{background:var(--gold)}
-.log .repay .d{background:#8f86a6}.log .approval .d{background:var(--gold)}.log .agent .d{background:var(--mut)}
-.log .t{color:var(--mut);font-size:13px;white-space:nowrap}
-.tx{color:var(--mut);font-size:12px}
-.log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line)}
-@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.wbody{grid-template-columns:1fr}.chartcol{border-right:none;border-bottom:3px solid var(--line)}.grid{grid-template-columns:1fr}.loop{flex-wrap:wrap}.arr{display:none}.step{flex:1 1 30%}}
+td{text-align:right;padding:10px 4px;border-bottom:1px solid var(--line);color:var(--muted)}
+tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
+.appr{border:1px solid rgba(164,181,110,.4);border-radius:12px;padding:13px;margin-bottom:10px}
+.appr p{font-size:13.5px;margin-bottom:10px}.appr .r{display:flex;gap:8px}
+.empty{color:var(--faint);font-size:13.5px}
+.log{list-style:none;padding:0;margin:0;max-height:300px;overflow-y:auto;display:grid;gap:4px}
+.log li{display:grid;grid-template-columns:9px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;background:var(--surface-2);font-size:13px}
+.log .d{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.log .spend .d{background:#7fa0d0}.log .invest .d{background:var(--olive)}.log .defi .d{background:#d8b26a}
+.log .repay .d{background:#b79bd6}.log .approval .d{background:#d8b26a}
+.log .t{color:var(--faint);font-size:11.5px;white-space:nowrap}
+.tx{color:var(--faint);font-size:11px;font-family:ui-monospace,Menlo,monospace}
+.log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+
+@media(max-width:900px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .row1{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+  .loop{flex-wrap:wrap;gap:18px}.arr{display:none}.step{flex:1 1 40%}
+}
 @media(max-width:640px){
- .top{position:static;padding-top:max(8px,env(safe-area-inset-top,8px))}
- .topin{height:auto;flex-direction:column;align-items:stretch;gap:12px;padding-top:2px;padding-bottom:14px}
- .brand{flex-wrap:wrap}
- .ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
- .ctrls .btn{justify-content:center}
- .kpis{grid-template-columns:1fr 1fr;gap:10px}
- .kval{font-size:26px}
- .chartcol .big{font-size:38px}
- .step{flex:1 1 40%}
+  .topbar{position:static}
+  .tb-in{height:auto;flex-direction:column;align-items:stretch;gap:12px;padding:12px 0 14px}
+  .tb-ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 }
 </style></head><body>
 
-<div class="top"><div class="wrap topin">
- <div class="brand"><span class="ic"><canvas id="coinNav" width="20" height="20"></canvas></span>
-  <b>OLEA</b><span id="mode" class="pill">SIMULATION</span></div>
- <div class="ctrls">
-  <a class="home btn alt" href="./index.html">◂ HOME</a>
-  <button id="btnSpend" class="btn alt">+ SPEND</button>
-  <button id="btnAuto" class="btn">▸ AUTOPILOT</button>
-  <button id="btnRepay" class="btn alt">$ REPAY</button>
- </div>
-</div></div>
-
-<main class="wrap">
- <div class="kpis">
-  <div class="panel kcard"><div class="eyebrow">OLEA VALUE</div><div id="kFlywheel" class="kval">$0.00</div><div class="ksub">PORTFOLIO + RESERVE</div></div>
-  <div class="panel kcard"><div class="eyebrow">RETURN</div><div id="kReturn" class="kval green">$0.00</div><div id="kReturnSub" class="ksub">0.00%</div></div>
-  <div class="panel kcard"><div class="eyebrow">SPARE CHANGE</div><div id="kCaptured" class="kval">$0.00</div><div class="ksub">FROM ROUND-UPS</div></div>
-  <div class="panel kcard"><div class="eyebrow">YIELD EARNED</div><div id="kYield" class="kval green">$0.0000</div><div id="kApy" class="ksub">—</div></div>
-  <div class="panel kcard"><div class="eyebrow">CARD OFFSET</div><div id="kOffset" class="kval">$0.00</div><div class="ksub">AUTO-REPAID</div></div>
- </div>
-
- <div class="panel win">
-  <div class="wbar"><div class="l"><span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span> OLEA.EXE</div><div class="l gold">● LIVE</div></div>
-  <div class="wbody">
-   <div class="chartcol">
-    <div class="lab">OLEA VALUE</div>
-    <div id="bigVal" class="big">$0.00</div>
-    <div id="bigDelta" class="up green">▲ $0.00 · 0.00% THIS SESSION</div>
-    <canvas id="barCanvas" width="600" height="170"></canvas>
-   </div>
-   <div class="alloccol">
-    <h4>BASKET ALLOCATION</h4>
-    <div id="alloc"></div>
-   </div>
+<header class="topbar"><div class="container tb-in">
+  <div class="tb-brand"><img src="./olea-mark.png" alt="Olea"/><span class="name">Olea</span><span id="mode" class="pill">Simulation</span></div>
+  <div class="tb-ctrls">
+    <a class="btn btn-sm" href="./index.html">← Home</a>
+    <button id="btnSpend" class="btn btn-sm">+ Simulate purchase</button>
+    <button id="btnAuto" class="btn btn-primary btn-sm">▶ Autopilot</button>
+    <button id="btnRepay" class="btn btn-sm">Auto-repay</button>
   </div>
- </div>
+</div></header>
 
- <div class="panel loopcard">
-  <div class="loop">
-   <div class="step"><div class="tile" data-node="spend"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/></svg></div><h3>SPEND</h3><small id="lSpend">$0</small></div>
-   <div class="arr">▸</div>
-   <div class="step"><div class="tile" data-node="roundup"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10"/><path d="M4 7l4-4 4 4"/></svg></div><h3>ROUND-UP</h3><small id="lMult">×—</small></div>
-   <div class="arr">▸</div>
-   <div class="step"><div class="tile" data-node="invest"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/><path d="M11 5h3v3"/></svg></div><h3>INVEST</h3><small id="lInvest">$0</small></div>
-   <div class="arr">▸</div>
-   <div class="step"><div class="tile" data-node="yield"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M6 8h4"/><path d="M8 6v4"/></svg></div><h3>YIELD</h3><small id="lApy">—</small></div>
-   <div class="arr">▸</div>
-   <div class="step"><div class="tile" data-node="repay"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/><path d="M5 11l-2-2 2-2"/></svg></div><h3>REPAY</h3><small id="lRepay">$0</small></div>
+<main class="container">
+  <div class="kpis">
+    <div class="kcard"><div class="k">Olea value</div><div id="kFlywheel" class="v num">$0.00</div><div class="s">portfolio + reserve</div></div>
+    <div class="kcard"><div class="k">Return</div><div id="kReturn" class="v num accent">$0.00</div><div id="kReturnSub" class="s accent">0.00%</div></div>
+    <div class="kcard"><div class="k">Spare change</div><div id="kCaptured" class="v num">$0.00</div><div class="s">from round-ups</div></div>
+    <div class="kcard"><div class="k">Yield earned</div><div id="kYield" class="v num accent">$0.0000</div><div id="kApy" class="s">—</div></div>
+    <div class="kcard"><div class="k">Card offset</div><div id="kOffset" class="v num">$0.00</div><div class="s">auto-repaid</div></div>
   </div>
- </div>
 
- <div class="grid">
-  <div class="panel pad"><div class="head"><h2>GUARDRAILS</h2><span class="hint">ENFORCED</span></div><ul id="guard" class="guard"></ul></div>
-  <div class="panel pad"><div class="head"><h2>BASKET</h2><span id="basketName" class="hint">—</span></div>
-   <table><thead><tr><th>TOKEN</th><th>PRICE</th><th>SHARES</th><th>VALUE</th></tr></thead><tbody id="holdings"></tbody></table></div>
-  <div class="panel pad"><div class="head"><h2>APPROVALS</h2><span class="hint">HIGH-VALUE</span></div><div id="approvals" class="approvals"><p class="empty">NOTHING WAITING.</p></div></div>
-  <div class="panel pad"><div class="head"><h2>ON-CHAIN LOG</h2><span id="txCount" class="hint">0 TX</span></div><ul id="log" class="log"></ul></div>
- </div>
+  <div class="row1">
+    <div class="panel">
+      <div class="p-head"><h2>Overview</h2><span class="live"><span class="d"></span> Live</span></div>
+      <div class="ov-body">
+        <div class="ov-lab">Olea value</div>
+        <div id="bigVal" class="ov-val num">$0.00</div>
+        <div id="bigDelta" class="ov-delta accent num">▲ $0.00 · +0.00% this session</div>
+        <canvas id="lineCanvas" width="720" height="180"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="p-head"><h2>Basket allocation</h2><span id="basketName" class="hint">—</span></div>
+      <div class="alloc-body">
+        <canvas id="allocCanvas" width="190" height="190"></canvas>
+        <div id="allocLegend" class="alloc-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="p-head"><h2>The loop</h2><span class="hint">spend → round-up → invest → yield → repay</span></div>
+    <div class="loop">
+      <div class="step"><div class="tile" data-node="spend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><h4>Spend</h4><small id="lSpend">$0</small></div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
+      <div class="step"><div class="tile" data-node="roundup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14"/><path d="m18 13-6-6-6 6"/><path d="M12 7v14"/></svg></div><h4>Round-up</h4><small id="lMult">×—</small></div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
+      <div class="step"><div class="tile" data-node="invest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg></div><h4>Invest</h4><small id="lInvest">$0</small></div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
+      <div class="step"><div class="tile" data-node="yield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6"/><path d="M12 9v6"/></svg></div><h4>Yield</h4><small id="lApy">—</small></div>
+      <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10 4 15l5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></div>
+      <div class="step"><div class="tile" data-node="repay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="m7 15-2-2 2-2"/></svg></div><h4>Auto-repay</h4><small id="lRepay">$0</small></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Guardrails</h2><span class="hint">enforced by the agent</span></div><ul id="guard" class="guard" style="margin-top:6px"></ul></div>
+    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Tokenized basket</h2><span id="basketName2" class="hint">—</span></div>
+      <table style="margin-top:6px"><thead><tr><th>Token</th><th>Price</th><th>Shares</th><th>Value</th></tr></thead><tbody id="holdings"></tbody></table></div>
+    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Pending approvals</h2><span class="hint">high-value</span></div><div id="approvals" style="margin-top:12px"><p class="empty">Nothing waiting.</p></div></div>
+    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>On-chain activity</h2><span id="txCount" class="hint">0 tx</span></div><ul id="log" class="log" style="margin-top:12px"></ul></div>
+  </div>
 </main>
 
-<script>
-// nav coin sprite
-(function(){const cv=document.getElementById('coinNav');if(!cv)return;const N=10,ctx=cv.getContext('2d'),S=cv.width/N,c=(N-1)/2;
- const P=(x,y,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x*S),Math.round(y*S),Math.ceil(S),Math.ceil(S));};
- for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);if(d>N/2-0.5)continue;
-  if(d>N/2-1.6){P(x,y,'#4a5636');continue;}P(x,y,'#232a16');}
- [[-1,-2],[0,-2],[0,-1],[1,-1],[-1,0],[0,0],[-1,1],[-1,2]].forEach(([x,y])=>P(c+x,c+y,'#cfe0a6'));
-})();
-</script>
 <script type="module" src="./app.js"></script>
 </body></html>

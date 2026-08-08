@@ -76,11 +76,12 @@ Each round-up runs through `server/agent.js`, which:
 
 ```
 public/                 The web app — runs standalone, no backend
-  index.html            Pixel/8-bit landing page ("Launch App" → app.html)
-  app.html              Pixel dashboard shell (the live agent)
-  app.js                Dashboard controller + pixel canvas chart
+  index.html            Landing page ("Launch app" → app.html)
+  app.html              Dashboard shell (the live agent)
+  app.js                Dashboard controller + canvas charts
   engine.js             The full flywheel simulation, in the browser
-  pixel.css             Embedded pixel fonts (Press Start 2P + VT323, base64)
+  styles.css            Shared design system (modern dark, olive accent)
+  olea-mark.png         The Olea leaf logo / favicon
 server/                 Optional Node server for local dev + real integration
   index.js              Static host + REST/SSE + real-integration seams
   flywheel.js           Server-side engine (mirrors the browser one)
