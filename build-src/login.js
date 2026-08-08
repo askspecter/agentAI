@@ -27,6 +27,7 @@ const isLogout = new URLSearchParams(window.location.search).has("logout");
 function Inner() {
   const { ready, authenticated, user, login, logout } = usePrivy();
   const [busy, setBusy] = React.useState(false);
+  const opened = React.useRef(false);
 
   React.useEffect(() => {
     if (!ready) return;
@@ -44,12 +45,16 @@ function Inner() {
         localStorage.setItem("olea_user", displayFor(user));
       } catch (e) {}
       window.location.replace("/app");
+      return;
+    }
+    // Open the Privy modal exactly once (guarded so a re-emitted `ready`
+    // can't trigger a second modal).
+    if (!opened.current) {
+      opened.current = true;
+      setBusy(true);
+      try { login(); } catch (e) {}
     }
   }, [ready, authenticated]);
-
-  React.useEffect(() => {
-    if (ready && !authenticated && !isLogout) { setBusy(true); try { login(); } catch (e) {} }
-  }, [ready]);
 
   const onClick = () => { setBusy(true); try { login(); } catch (e) {} };
 
