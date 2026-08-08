@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Docs · olea</title>
+<link rel="icon" href="./olea-mark.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"/>
+<link rel="stylesheet" href="./styles.css"/>
+</head><body>
+<header class="nav"><div class="container nav-in">
+  <a class="brand" href="./index.html"><img src="./olea-mark.png" alt="olea"/><span class="name">olea</span></a>
+  <div class="nav-cta"><a class="btn btn-sm" href="./index.html">← Back</a><a class="btn btn-primary btn-sm" href="./app.html">Launch app →</a></div>
+</div></header>
+
+<main class="page prose">
+  <a class="kicker-link" href="./index.html">← Home</a>
+  <h1>Docs</h1>
+  <div class="updated">How Olea works, end to end</div>
+
+  <h2>What is Olea?</h2>
+  <p>Olea is an autonomous agent on the Robinhood network that turns everyday card spending into a self-sustaining flywheel: it rounds up each purchase, invests the spare change in tokenized stocks on-chain, earns DeFi yield on the idle reserve, and uses that yield to auto-repay your card.</p>
+
+  <h2>The loop</h2>
+  <ul>
+    <li><strong>Spend.</strong> Use your Robinhood card as normal.</li>
+    <li><strong>Round-up.</strong> The agent captures the spare change, up to 5×.</li>
+    <li><strong>Invest.</strong> The change is deployed into a tokenized-stock basket on Robinhood Chain, always nudging toward your target weights.</li>
+    <li><strong>Earn yield.</strong> A reserve slice sits in a DeFi pool earning yield between buys.</li>
+    <li><strong>Auto-repay.</strong> Yield is swept back to pay down the card, closing the loop so your principal keeps working.</li>
+  </ul>
+
+  <h2>Guardrails</h2>
+  <p>The agent runs inside a dedicated, funded account and can only ever touch what you allow:</p>
+  <ul>
+    <li>Round-up multiplier and a minimum card buffer</li>
+    <li>Per-trade cap and daily invest cap</li>
+    <li>A manual-approval threshold for large deployments</li>
+    <li>On-chain settlement for a verifiable, real-time record</li>
+  </ul>
+
+  <h2>Architecture</h2>
+  <p>The live app is a fully client-side simulation, so it runs on any static host with no backend. The simulation engine models a price feed, the tokenized-stock positions, the DeFi yield reserve, and the agent’s decisions.</p>
+  <p>For a real deployment, the codebase keeps clearly-marked integration seams:</p>
+  <ul>
+    <li><strong>Trading MCP</strong>: routes real orders through Robinhood’s Agentic Account.</li>
+    <li><strong>Robinhood Chain</strong>: settlement of tokenized-stock buys and DeFi yield.</li>
+    <li><strong>Card webhook</strong>: the inbound feed of card purchases that starts the loop.</li>
+  </ul>
+
+  <h2>Try it</h2>
+  <p><a href="./app.html">Launch the app</a> and hit <strong>Autopilot</strong> to watch the loop run live. More questions? See the <a href="./index.html#faq">FAQ</a> or ping <a href="https://x.com/oleacash" target="_blank" rel="noopener">@oleacash</a>.</p>
+
+  <hr/>
+  <p>Olea is a prototype and is not affiliated with, sponsored by, or endorsed by Robinhood Markets, Inc.</p>
+</main>
+
+<footer class="footer"><div class="footer-bottom"><div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:16px;flex-wrap:wrap">
+  <span>© 2026 olea · On the Robinhood network</span>
+  <span style="display:flex;align-items:center;gap:12px"><a href="https://x.com/oleacash" target="_blank" rel="noopener">@oleacash</a><a class="soc" href="https://x.com/oleacash" target="_blank" rel="noopener" aria-label="olea on X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg></a></span>
+</div></div></footer>
+</body></html>
