@@ -5,7 +5,7 @@
 <title>Log in · olea</title>
 <link rel="icon" href="/favicon.png"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-<link rel="modulepreload" href="/login-bundle.js"/>
+<link rel="modulepreload" href="/login-bundle.js?v=3"/>
 <link rel="preconnect" href="https://auth.privy.io" crossorigin/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -52,13 +52,21 @@
   var btn = document.getElementById("continueBtn");
   var status = document.getElementById("lstatus");
   var loading = false;
+  function load(attempt) {
+    return import("/login-bundle.js?v=3").catch(function (e) {
+      if (attempt < 3) {
+        return new Promise(function (r) { setTimeout(r, 700 * attempt); }).then(function () { return load(attempt + 1); });
+      }
+      throw e;
+    });
+  }
   function start() {
     if (loading) return;
     loading = true;
     btn.disabled = true;
     btn.textContent = "Opening…";
     status.innerHTML = '<span class="spinner"></span>Opening secure login…';
-    import("/login-bundle.js").catch(function (e) {
+    load(1).catch(function (e) {
       loading = false;
       btn.disabled = false;
       btn.textContent = "Try again";
