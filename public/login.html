@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Log in · olea</title>
+<link rel="icon" href="/favicon.png"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"/>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+.wrap-login{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px;position:relative;overflow:hidden}
+.wrap-login:before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(700px 520px at 50% 8%,rgba(164,181,110,.14),transparent 60%)}
+.card-login{width:100%;max-width:400px;background:linear-gradient(180deg,var(--surface),var(--bg-2));
+  border:1px solid var(--line);border-radius:20px;padding:34px 30px;text-align:center;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.7)}
+.card-login .mk{width:56px;height:56px;margin:0 auto 18px;border-radius:15px;display:grid;place-items:center;
+  background:var(--olive-soft);border:1px solid rgba(164,181,110,.25)}
+.card-login .mk img{width:30px}
+.card-login h1{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:-.02em}
+.card-login p.sub{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.5}
+.card-login .btn{width:100%;margin-top:22px}
+.card-login .status{color:var(--faint);font-size:13px;margin-top:16px;min-height:18px}
+.card-login .guest{display:inline-block;margin-top:18px;color:var(--muted);font-size:13.5px}
+.card-login .guest:hover{color:var(--olive)}
+.card-login .fine{color:var(--faint);font-size:11.5px;margin-top:22px;line-height:1.5}
+.card-login .fine a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--olive);border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head><body>
+<div class="wrap-login">
+  <div id="root" class="card-login">
+    <div class="mk"><img src="/olea-mark.png" alt="olea"/></div>
+    <h1>Log in to olea</h1>
+    <p class="sub">Continue with email or your wallet.</p>
+    <div class="status"><span class="spinner"></span>Loading secure login…</div>
+    <a class="guest" href="/app">Continue as guest →</a>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{
+  "react":"https://esm.sh/react@18.3.1",
+  "react-dom":"https://esm.sh/react-dom@18.3.1",
+  "react-dom/client":"https://esm.sh/react-dom@18.3.1/client",
+  "@privy-io/react-auth":"https://esm.sh/@privy-io/react-auth@2?external=react,react-dom"
+}}
+</script>
+<script type="module">
+const APP_ID = "cmsjzwzna00qi0cjv5ytexft3";
+try {
+  const React = (await import("react")).default;
+  const { createRoot } = await import("react-dom/client");
+  const { PrivyProvider, usePrivy } = await import("@privy-io/react-auth");
+  const h = React.createElement;
+
+  function Inner() {
+    const { ready, authenticated, login } = usePrivy();
+    const [busy, setBusy] = React.useState(false);
+
+    React.useEffect(() => {
+      if (ready && authenticated) {
+        try { localStorage.setItem("olea_authed", "1"); } catch (e) {}
+        window.location.replace("/app");
+      }
+    }, [ready, authenticated]);
+
+    // auto-open the Privy modal once ready
+    React.useEffect(() => {
+      if (ready && !authenticated) { setBusy(true); try { login(); } catch (e) {} }
+    }, [ready]);
+
+    const onClick = () => { setBusy(true); try { login(); } catch (e) {} };
+
+    return h("div", null,
+      h("div", { className: "mk" }, h("img", { src: "/olea-mark.png", alt: "olea" })),
+      h("h1", null, "Log in to olea"),
+      h("p", { className: "sub" }, "Continue with email or your wallet."),
+      h("button", { className: "btn btn-primary", onClick, disabled: !ready },
+        !ready ? h("span", null, h("span", { className: "spinner" }), "Preparing…")
+               : (busy ? "Opening…" : "Continue")),
+      h("div", { className: "status" }, ready ? "" : "Connecting to Privy…"),
+      h("a", { className: "guest", href: "/app" }, "Continue as guest →"),
+      h("div", { className: "fine" },
+        "By continuing you agree to our ",
+        h("a", { href: "/terms" }, "Terms"), " and ",
+        h("a", { href: "/privacy" }, "Privacy Policy"), ".")
+    );
+  }
+
+  function Root() {
+    return h(PrivyProvider, {
+      appId: APP_ID,
+      config: {
+        loginMethods: ["email", "wallet"],
+        appearance: {
+          theme: "dark",
+          accentColor: "#a4b56e",
+          logo: window.location.origin + "/favicon.png",
+        },
+      },
+    }, h(Inner));
+  }
+
+  createRoot(document.getElementById("root")).render(h(Root));
+} catch (err) {
+  const s = document.querySelector("#root .status");
+  if (s) s.textContent = "Could not load secure login. Continue as guest below.";
+  console.error("Privy load failed:", err);
+}
+</script>
+</body></html>
