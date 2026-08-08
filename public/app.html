@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="./pixel.css"/>
 <style>
 :root{
- --bg:#0a0f0a; --panel:#0f170f; --panel2:#122012; --ink:#e9ffe9; --dim:#7fb98f; --mut:#5c8a6b;
- --grn:#39ff88; --grn-d:#1f7a45; --gold:#ffd23f; --pink:#ff5fa2; --line:#2b4a30; --shadow:#040704;
+ --bg:#0b0d08; --panel:#12160d; --panel2:#171c10; --ink:#eef2e6; --dim:#93a07a; --mut:#6e7a58;
+ --grn:#7f9158; --grn-d:#4a5636; --gold:#cdb46a; --pink:#c07a55; --line:#333c26; --shadow:#050603;
 }
 *{box-sizing:border-box;margin:0}
 html{image-rendering:pixelated}
@@ -93,7 +93,7 @@ tr:last-child td{border:none}
 .log li{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:center;padding:8px 0;border-bottom:2px solid #14201466;font-size:15px}
 .log .d{width:8px;height:8px}
 .log .spend .d{background:var(--pink)}.log .invest .d{background:var(--grn)}.log .defi .d{background:var(--gold)}
-.log .repay .d{background:#9d7bff}.log .approval .d{background:var(--gold)}.log .agent .d{background:var(--mut)}
+.log .repay .d{background:#8f86a6}.log .approval .d{background:var(--gold)}.log .agent .d{background:var(--mut)}
 .log .t{color:var(--mut);font-size:13px;white-space:nowrap}
 .tx{color:var(--mut);font-size:12px}
 .log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line)}
@@ -164,8 +164,8 @@ tr:last-child td{border:none}
 (function(){const cv=document.getElementById('coinNav');if(!cv)return;const N=10,ctx=cv.getContext('2d'),S=cv.width/N,c=(N-1)/2;
  const P=(x,y,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x*S),Math.round(y*S),Math.ceil(S),Math.ceil(S));};
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);if(d>N/2-0.5)continue;
-  if(d>N/2-1.6){P(x,y,'#1f7a45');continue;}P(x,y,'#123018');}
- [[-1,-2],[0,-2],[0,-1],[1,-1],[-1,0],[0,0],[-1,1],[-1,2]].forEach(([x,y])=>P(c+x,c+y,'#9dffc4'));
+  if(d>N/2-1.6){P(x,y,'#4a5636');continue;}P(x,y,'#232a16');}
+ [[-1,-2],[0,-2],[0,-1],[1,-1],[-1,0],[0,0],[-1,1],[-1,2]].forEach(([x,y])=>P(c+x,c+y,'#cfe0a6'));
 })();
 </script>
 <script type="module" src="./app.js"></script>

@@ -11,7 +11,7 @@ const pct = (n) => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
 
 const fw = new Flywheel(CONFIG);
 const history = [];
-const ALLOC = ["#39ff88", "#ffd23f", "#ff5fa2", "#9d7bff", "#4dd0e1"];
+const ALLOC = ["#7f9158", "#cdb46a", "#c07a55", "#8a9b6a", "#5f7048"];
 let autopilot = null;
 let lastLogId = 0;
 
@@ -49,9 +49,9 @@ function drawBars(cv, data) {
     const h = Math.round(((v - min) / (max - min)) * (H - pad * 2 - 6)) + 6;
     const x = pad + i * bw;
     const y = H - pad - h;
-    ctx.fillStyle = "#1f7a45";
+    ctx.fillStyle = "#55663a";
     ctx.fillRect(x, y, bw - gap, h);
-    ctx.fillStyle = "#39ff88"; // bright pixel cap
+    ctx.fillStyle = "#9fb374"; // bright pixel cap
     ctx.fillRect(x, y, bw - gap, 4);
   });
 }
