@@ -1,7 +1,7 @@
 {
-  "name": "robinhood-spend-to-invest-flywheel",
+  "name": "olea",
   "version": "0.1.0",
-  "description": "An autonomous agent on the Robinhood network that turns everyday card spending into an on-chain invest → yield → auto-repay flywheel. Runs as a web app.",
+  "description": "Olea — a spend-to-invest flywheel agent on the Robinhood network that turns everyday card spending into an on-chain invest → yield → auto-repay loop. Runs as a web app.",
   "type": "module",
   "main": "server/index.js",
   "scripts": {

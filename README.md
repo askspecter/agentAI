@@ -1,7 +1,11 @@
-# 🛞 Spend-to-Invest Flywheel
+# 🫒 Olea
 
-**An autonomous agent on the Robinhood network that turns everyday card spending
-into an on-chain invest → yield → auto-repay loop — running as a web app.**
+**The Spend-to-Invest Flywheel — an autonomous agent on the Robinhood network
+that turns everyday card spending into an on-chain invest → yield → auto-repay
+loop, running as a web app.**
+
+_Olea_ (Latin for the olive tree) is named for the way an olive grows: slowly,
+quietly, and for a very long time — the same way spare change compounds here.
 
 Nobody has shipped this yet. Robinhood's 2026 pieces exist *separately*:
 
