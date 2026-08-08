@@ -72,10 +72,11 @@ Each round-up runs through `server/agent.js`, which:
 
 ```
 public/                 The web app — runs standalone, no backend
-  index.html            Dashboard markup (SVG icons, no dependencies)
-  styles.css            Clean dark theme
-  app.js                UI controller + canvas charts
+  index.html            Pixel/8-bit landing page ("Launch App" → app.html)
+  app.html              Pixel dashboard shell (the live agent)
+  app.js                Dashboard controller + pixel canvas chart
   engine.js             The full flywheel simulation, in the browser
+  pixel.css             Embedded pixel fonts (Press Start 2P + VT323, base64)
 server/                 Optional Node server for local dev + real integration
   index.js              Static host + REST/SSE + real-integration seams
   flywheel.js           Server-side engine (mirrors the browser one)

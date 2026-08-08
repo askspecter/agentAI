@@ -1,189 +1,129 @@
-// Dashboard controller. Runs the flywheel entirely in the browser (works on any
-// static host) and renders it. No backend required.
+// Pixel dashboard controller. Runs the flywheel simulation in the browser
+// (public/engine.js) and renders it in an 8-bit / arcade skin. No backend.
 
 import { Flywheel, CONFIG } from "./engine.js";
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money0 = (n) => "$" + Math.round(Number(n)).toLocaleString("en-US");
 const money4 = (n) => "$" + Number(n).toFixed(4);
 const pct = (n) => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
-const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 const fw = new Flywheel(CONFIG);
 const history = [];
-const ALLOC_COLORS = ["#00c805", "#4d8dff", "#e3b341", "#a371f7", "#ff8a5c", "#4dd0e1"];
-
+const ALLOC = ["#39ff88", "#ffd23f", "#ff5fa2", "#9d7bff", "#4dd0e1"];
 let autopilot = null;
 let lastLogId = 0;
 
-// ---- controls ------------------------------------------------------------
-$("spendBtn").onclick = () => {
-  fw.simulatePurchase();
-  render();
-};
-$("repayBtn").onclick = () => {
-  fw.runRepayment();
-  render();
-};
-$("autopilotBtn").onclick = () => {
-  const b = $("autopilotBtn");
+// ---- controls ----
+$("btnSpend").onclick = () => { fw.simulatePurchase(); render(); };
+$("btnRepay").onclick = () => { fw.runRepayment(); render(); };
+$("btnAuto").onclick = () => {
+  const b = $("btnAuto");
   if (autopilot) {
-    clearInterval(autopilot);
-    autopilot = null;
-    b.classList.remove("on");
-    b.querySelector(".lbl").textContent = "Autopilot";
+    clearInterval(autopilot); autopilot = null;
+    b.classList.remove("on"); b.textContent = "▸ AUTOPILOT";
   } else {
-    autopilot = setInterval(() => {
-      fw.simulatePurchase();
-      render();
-    }, 2000);
-    b.classList.add("on");
-    b.querySelector(".lbl").textContent = "Autopilot on";
+    autopilot = setInterval(() => { fw.simulatePurchase(); render(); }, 1800);
+    b.classList.add("on"); b.textContent = "❚❚ AUTO ON";
   }
 };
+window.__approve = (id, ok) => { fw.resolveApproval(id, ok); render(); };
 
-window.__approve = (id, ok) => {
-  fw.resolveApproval(id, ok);
-  render();
-};
+// heartbeat: prices + yield
+setInterval(() => { fw.tick(1); render(); }, 1000);
 
-// ---- heartbeat: move prices + accrue yield -------------------------------
-setInterval(() => {
-  fw.tick(1);
-  render();
-}, 1000);
-
-// ---- charts --------------------------------------------------------------
-function drawLine(canvas, series) {
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height, pad = 30;
+// ---- pixel bar chart ----
+function drawBars(cv, data) {
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, pad = 6;
   ctx.clearRect(0, 0, W, H);
-  if (series[0].data.length < 2) return;
-  const all = series.flatMap((s) => s.data);
-  let min = Math.min(...all), max = Math.max(...all);
+  if (data.length < 2) return;
+  const n = Math.min(data.length, 48);
+  const slice = data.slice(-n);
+  let min = Math.min(...slice), max = Math.max(...slice);
   if (min === max) { min -= 1; max += 1; }
-  const x = (i, n) => pad + (i / (n - 1)) * (W - pad * 2);
-  const y = (v) => H - pad - ((v - min) / (max - min)) * (H - pad * 2);
-
-  ctx.strokeStyle = css("--line"); ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
-
-  for (const s of series) {
-    const n = s.data.length;
-    // soft fill under the primary line
-    if (s.fill) {
-      const g = ctx.createLinearGradient(0, pad, 0, H - pad);
-      g.addColorStop(0, s.color + "33");
-      g.addColorStop(1, s.color + "00");
-      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x(0, n), H - pad);
-      s.data.forEach((v, i) => ctx.lineTo(x(i, n), y(v)));
-      ctx.lineTo(x(n - 1, n), H - pad); ctx.closePath(); ctx.fill();
-    }
-    ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.beginPath();
-    s.data.forEach((v, i) => (i ? ctx.lineTo(x(i, n), y(v)) : ctx.moveTo(x(i, n), y(v))));
-    ctx.stroke();
-  }
-  ctx.font = "600 11px system-ui"; ctx.textAlign = "right";
-  for (const s of series) {
-    const v = s.data[s.data.length - 1];
-    ctx.fillStyle = s.color;
-    ctx.fillText(money(v), W - pad - 2, Math.min(H - pad - 4, Math.max(12, y(v) - 6)));
-  }
-}
-
-function drawAlloc(canvas, positions) {
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height, cx = W / 2, cy = H / 2;
-  const r = Math.min(W, H) / 2 - 14, r0 = r * 0.6;
-  ctx.clearRect(0, 0, W, H);
-  const total = positions.reduce((a, p) => a + p.value, 0);
-  const legend = $("allocLegend");
-  if (total <= 0) {
-    ctx.strokeStyle = css("--line"); ctx.lineWidth = 14;
-    ctx.beginPath(); ctx.arc(cx, cy, (r + r0) / 2, 0, Math.PI * 2); ctx.stroke();
-    legend.innerHTML = `<span class="empty">No positions yet.</span>`;
-    return;
-  }
-  let a = -Math.PI / 2;
-  legend.innerHTML = "";
-  positions.forEach((p, i) => {
-    const frac = p.value / total, col = ALLOC_COLORS[i % ALLOC_COLORS.length];
-    const a2 = a + frac * Math.PI * 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, a, a2); ctx.closePath();
-    ctx.fillStyle = col; ctx.fill();
-    a = a2;
-    legend.innerHTML += `<span><i class="sw" style="background:${col}"></i>${p.ticker} ${(frac * 100).toFixed(0)}%</span>`;
+  const bw = Math.max(4, Math.floor((W - pad * 2) / n));
+  const gap = Math.max(1, Math.floor(bw * 0.18));
+  slice.forEach((v, i) => {
+    const h = Math.round(((v - min) / (max - min)) * (H - pad * 2 - 6)) + 6;
+    const x = pad + i * bw;
+    const y = H - pad - h;
+    ctx.fillStyle = "#1f7a45";
+    ctx.fillRect(x, y, bw - gap, h);
+    ctx.fillStyle = "#39ff88"; // bright pixel cap
+    ctx.fillRect(x, y, bw - gap, 4);
   });
-  ctx.fillStyle = css("--panel-2"); ctx.beginPath(); ctx.arc(cx, cy, r0, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = css("--text"); ctx.textAlign = "center"; ctx.font = "700 15px system-ui";
-  ctx.fillText(money(total), cx, cy + 5);
 }
 
-// ---- render --------------------------------------------------------------
+// ---- render ----
 function flash(node) {
-  const el = document.querySelector(`.node[data-node="${node}"]`);
+  const el = document.querySelector(`.tile[data-node="${node}"]`);
   if (!el) return;
   el.classList.add("flash");
-  setTimeout(() => el.classList.remove("flash"), 650);
+  setTimeout(() => el.classList.remove("flash"), 500);
 }
 
 function render() {
   const s = fw.snapshot();
-  $("mode").textContent = s.mode;
+  $("mode").textContent = s.mode.toUpperCase();
 
   const gain = s.money.returnUsd >= 0;
-  $("flywheelValue").textContent = money(s.money.flywheelValue);
-  $("return").textContent = (gain ? "+" : "−") + money(Math.abs(s.money.returnUsd)).slice(0);
-  $("return").className = "kpi-value " + (gain ? "up" : "down");
-  $("returnPct").textContent = pct(s.money.returnPct);
-  $("returnPct").className = "kpi-sub " + (gain ? "up" : "down");
-  $("captured").textContent = money(s.money.totalCaptured);
-  $("yield").textContent = money4(s.chain.yieldEarned);
-  $("apy").textContent = (s.chain.defiApy * 100).toFixed(1) + "% APY";
-  $("offset").textContent = money(s.money.totalRepaid);
+  $("kFlywheel").textContent = money(s.money.flywheelValue);
+  $("kReturn").textContent = (gain ? "+" : "−") + money(Math.abs(s.money.returnUsd)).replace("$", "$");
+  $("kReturn").className = "kval " + (gain ? "green" : "pink");
+  $("kReturnSub").textContent = pct(s.money.returnPct);
+  $("kCaptured").textContent = money(s.money.totalCaptured);
+  $("kYield").textContent = money4(s.chain.yieldEarned);
+  $("kApy").textContent = (s.chain.defiApy * 100).toFixed(1) + "% APY";
+  $("kOffset").textContent = money(s.money.totalRepaid);
 
-  $("fSpent").textContent = money(s.money.totalSpent);
-  $("fMult").textContent = "×" + s.guardrails.roundUpMultiplier;
-  $("fInvested").textContent = money(s.money.totalInvested);
-  $("fApy").textContent = (s.chain.defiApy * 100).toFixed(1) + "% APY";
-  $("fRepaid").textContent = money(s.money.totalRepaid);
-  $("txCount").textContent = s.txCount + " tx";
+  $("bigVal").textContent = money(s.money.flywheelValue);
+  $("bigDelta").textContent = `▲ ${money(s.money.returnUsd)} · ${pct(s.money.returnPct)} THIS SESSION`;
+  $("bigDelta").className = "up " + (gain ? "green" : "pink");
+
+  $("lSpend").textContent = money0(s.money.totalSpent);
+  $("lMult").textContent = "×" + s.guardrails.roundUpMultiplier;
+  $("lInvest").textContent = money0(s.money.totalInvested);
+  $("lApy").textContent = (s.chain.defiApy * 100).toFixed(0) + "% APY";
+  $("lRepay").textContent = money0(s.money.totalRepaid);
+  $("txCount").textContent = s.txCount + " TX";
 
   const g = s.guardrails;
-  $("guardrails").innerHTML = `
-    <li><span>Round-up multiplier</span><b>×${g.roundUpMultiplier}</b></li>
-    <li><span>Per-trade cap</span><b>${money(g.perTradeCapUsd)}</b></li>
-    <li><span>Daily invest cap</span><b>${money(g.dailyInvestCapUsd)}</b></li>
-    <li><span>Manual approval above</span><b>${money(g.manualApprovalAboveUsd)}</b></li>
-    <li><span>Min card buffer</span><b>${money(g.minCardBufferUsd)}</b></li>`;
+  $("guard").innerHTML = `
+    <li><span>ROUND-UP</span><b>×${g.roundUpMultiplier}</b></li>
+    <li><span>PER-TRADE CAP</span><b>${money(g.perTradeCapUsd)}</b></li>
+    <li><span>DAILY CAP</span><b>${money(g.dailyInvestCapUsd)}</b></li>
+    <li><span>APPROVAL ABOVE</span><b>${money(g.manualApprovalAboveUsd)}</b></li>
+    <li><span>CARD BUFFER</span><b>${money(g.minCardBufferUsd)}</b></li>`;
 
-  $("basketName").textContent = s.basket;
-  $("holdings").innerHTML = Object.keys(s.prices)
-    .map((tk) => {
-      const p = s.chain.positions.find((x) => x.ticker === tk);
-      return `<tr><td class="tk">${tk}</td><td>${money(s.prices[tk])}</td><td>${p ? p.shares.toFixed(4) : "0.0000"}</td><td>${money(p ? p.value : 0)}</td></tr>`;
-    })
-    .join("");
+  $("basketName").textContent = s.basket.toUpperCase();
+  $("holdings").innerHTML = Object.keys(s.prices).map((tk) => {
+    const p = s.chain.positions.find((x) => x.ticker === tk);
+    return `<tr><td class="tk">${tk}</td><td>${money(s.prices[tk])}</td><td>${p ? p.shares.toFixed(3) : "0.000"}</td><td>${money(p ? p.value : 0)}</td></tr>`;
+  }).join("");
 
-  const ap = $("approvals");
-  ap.innerHTML = s.pendingApprovals.length
-    ? s.pendingApprovals
-        .map(
-          (a) => `<div class="approval"><p>${a.reason}</p><div class="row">
-            <button class="btn btn-primary sm" onclick="__approve('${a.id}',true)">Approve</button>
-            <button class="btn sm" onclick="__approve('${a.id}',false)">Reject</button></div></div>`,
-        )
-        .join("")
-    : `<p class="empty">Nothing waiting.</p>`;
+  // allocation pixel bars
+  const total = s.chain.portfolioValue || 1;
+  $("alloc").innerHTML = s.chain.positions.map((p, i) => {
+    const w = Math.max(0, (p.value / total) * 100);
+    return `<div class="arow"><div class="t"><span class="tk">${p.ticker}</span><span>${w.toFixed(0)}%</span></div>
+      <div class="abar"><span style="width:${w}%;background:${ALLOC[i % ALLOC.length]}"></span></div></div>`;
+  }).join("") || `<p class="empty" style="color:var(--mut)">NO POSITIONS YET.</p>`;
 
-  history.push({ v: s.money.flywheelValue, c: s.money.netContributed });
-  if (history.length > 140) history.shift();
-  drawLine($("lineChart"), [
-    { color: "#4d8dff", data: history.map((h) => h.c) },
-    { color: "#00c805", data: history.map((h) => h.v), fill: true },
-  ]);
-  drawAlloc($("allocChart"), s.chain.positions);
+  // approvals
+  $("approvals").innerHTML = s.pendingApprovals.length
+    ? s.pendingApprovals.map((a) => `<div class="appr"><p>${a.reason.toUpperCase()}</p>
+        <div class="row"><button class="btn" onclick="__approve('${a.id}',true)">OK</button>
+        <button class="btn alt" onclick="__approve('${a.id}',false)">NO</button></div></div>`).join("")
+    : `<p class="empty">NOTHING WAITING.</p>`;
 
+  // chart
+  history.push(s.money.flywheelValue);
+  if (history.length > 240) history.shift();
+  drawBars($("barCanvas"), history);
+
+  // flash loop tiles on new events
   const newest = s.log[0];
   if (newest && newest.id !== lastLogId) {
     lastLogId = newest.id;
@@ -192,13 +132,12 @@ function render() {
     if (newest.type === "defi") flash("yield");
     if (newest.type === "repay") flash("repay");
   }
-  $("log").innerHTML = s.log
-    .map((e) => {
-      const t = new Date(e.at).toLocaleTimeString();
-      const tx = e.tx ? `<span class="tx">${e.tx.slice(0, 12)}…</span>` : "";
-      return `<li class="${e.type}"><span class="ldot"></span><span class="ltext">${e.text} ${tx}</span><span class="t">${t}</span></li>`;
-    })
-    .join("");
+
+  $("log").innerHTML = s.log.map((e) => {
+    const t = new Date(e.at).toLocaleTimeString();
+    const tx = e.tx ? `<span class="tx">${e.tx.slice(0, 10)}…</span>` : "";
+    return `<li class="${e.type}"><span class="d"></span><span>${e.text} ${tx}</span><span class="t">${t}</span></li>`;
+  }).join("");
 }
 
 render();

@@ -1,161 +1,176 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Spend-to-Invest Flywheel · Robinhood Agent</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="brand">
-        <span class="logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12a9 9 0 1 1-9-9" /><path d="M21 3v6h-6" /><path d="M21 3l-7.5 7.5" />
-          </svg>
-        </span>
-        <div class="brand-text">
-          <h1>Spend-to-Invest Flywheel</h1>
-          <p class="tagline">
-            Autonomous agent on the Robinhood network
-            <span class="dot">·</span>
-            <span id="mode" class="pill">connecting</span>
-          </p>
-        </div>
-      </div>
-      <div class="controls">
-        <button id="spendBtn" class="btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-          Simulate purchase
-        </button>
-        <button id="autopilotBtn" class="btn btn-primary">
-          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7 4v16l13-8z" /></svg>
-          <span class="lbl">Autopilot</span>
-        </button>
-        <button id="repayBtn" class="btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-          Auto-repay
-        </button>
-      </div>
-    </header>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Flywheel · Spend-to-Invest agent on the Robinhood network</title>
+<link rel="stylesheet" href="./pixel.css"/>
+<style>
+:root{
+ --bg:#0a0f0a; --panel:#0f170f; --panel2:#122012; --ink:#e9ffe9; --dim:#7fb98f; --mut:#5c8a6b;
+ --grn:#39ff88; --grn-d:#1f7a45; --gold:#ffd23f; --pink:#ff5fa2; --line:#2b4a30; --shadow:#040704;
+}
+*{box-sizing:border-box;margin:0}
+html{image-rendering:pixelated}
+body{font-family:'VT',monospace;background:var(--bg);color:var(--ink);font-size:20px;line-height:1.35;letter-spacing:.5px;position:relative}
+body:before{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+body:after{content:"";position:fixed;inset:0;z-index:99;pointer-events:none;background:radial-gradient(120% 120% at 50% 40%,transparent 60%,rgba(0,0,0,.55))}
+.px{font-family:'PS2P';letter-spacing:0;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+a{color:inherit;text-decoration:none}
+.green{color:var(--grn)}.gold{color:var(--gold)}
+.panel{background:var(--panel);border:3px solid var(--grn-d);box-shadow:6px 6px 0 var(--shadow);position:relative}
+.btn{font-family:'PS2P';font-size:11px;padding:14px 18px;border:3px solid #0a0f0a;cursor:pointer;background:var(--grn);color:#062412;box-shadow:4px 4px 0 var(--shadow);display:inline-flex;align-items:center;gap:8px;text-transform:uppercase}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
+.btn.alt{background:var(--panel2);color:var(--grn);border-color:var(--grn-d)}
+.btn.sm{font-size:9px;padding:10px 12px}
+.nav{border-bottom:3px solid var(--line);background:#0a0f0a;position:sticky;top:0;z-index:30}
+.navin{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .ic{width:34px;height:34px;background:var(--panel2);border:3px solid var(--grn-d);display:grid;place-items:center}
+.brand .ic canvas{width:22px;height:22px}
+.brand b{font-family:'PS2P';font-size:13px}
+.brand span{font-family:'PS2P';font-size:7px;color:var(--dim);display:block;margin-top:4px}
+.links{display:flex;gap:26px;font-family:'PS2P';font-size:9px;color:var(--dim)}
+.links a:hover{color:var(--grn)}
+.navb{display:flex;gap:10px}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:64px 0 44px}
+.tag{font-family:'PS2P';font-size:8px;color:var(--grn);border:2px solid var(--grn-d);background:var(--panel2);padding:8px 12px;display:inline-flex;gap:8px;align-items:center}
+.tag .b{width:8px;height:8px;background:var(--grn);box-shadow:0 0 0 2px #0a0f0a}
+h1{font-family:'PS2P';font-size:34px;line-height:1.35;margin:22px 0 0;text-shadow:4px 4px 0 var(--shadow)}
+.lead{color:var(--dim);font-size:22px;margin-top:22px;max-width:420px}
+.cta{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.viz{height:420px;display:grid;place-items:center}
+.viz canvas{width:300px;height:300px}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:10px 0}
+.stat{padding:18px}
+.stat .v{font-size:38px;line-height:1;color:var(--grn)}
+.stat .v.w{color:var(--ink)}
+.stat .l{font-family:'PS2P';font-size:8px;color:var(--dim);margin-top:10px;line-height:1.6}
+.sec{padding:56px 0}
+.kick{font-family:'PS2P';font-size:9px;color:var(--gold);text-align:center;letter-spacing:1px}
+.h2{font-family:'PS2P';font-size:22px;text-align:center;margin-top:16px;text-shadow:3px 3px 0 var(--shadow)}
+.win .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel2);border-bottom:3px solid var(--grn-d)}
+.win .bar .l{font-family:'PS2P';font-size:9px;display:flex;gap:10px;align-items:center}
+.dots{display:flex;gap:6px}.dots i{width:12px;height:12px;display:block;border:2px solid #0a0f0a}
+.dots .r{background:var(--pink)}.dots .y{background:var(--gold)}.dots .g{background:var(--grn)}
+.body{display:grid;grid-template-columns:1.5fr 1fr}
+.main{padding:24px;border-right:3px solid var(--line)}
+.main .lab{font-family:'PS2P';font-size:8px;color:var(--dim)}
+.main .big{font-size:56px;line-height:.9;margin-top:12px}
+.main .up{color:var(--grn);font-size:20px;margin-top:6px}
+.kpi{display:grid;grid-template-columns:1fr 1fr}
+.cell{padding:18px 20px;border-bottom:3px solid var(--line)}
+.cell:nth-child(odd){border-right:3px solid var(--line)}
+.cell:nth-child(n+3){border-bottom:none}
+.cell .lab{font-family:'PS2P';font-size:7px;color:var(--dim);line-height:1.6}
+.cell .v{font-size:30px;margin-top:8px}
+.loop{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-top:40px}
+.step{flex:1;text-align:center}
+.tile{width:78px;height:78px;margin:0 auto;background:var(--panel2);border:3px solid var(--grn-d);box-shadow:4px 4px 0 var(--shadow);display:grid;place-items:center;color:var(--grn)}
+.tile svg{width:34px;height:34px;shape-rendering:crispEdges}
+.no{font-family:'PS2P';font-size:8px;color:var(--gold);margin-top:16px}
+.step h3{font-family:'PS2P';font-size:11px;margin-top:8px}
+.step p{color:var(--dim);font-size:18px;margin-top:8px;max-width:160px;margin-inline:auto;line-height:1.3}
+.arr{align-self:center;font-family:'PS2P';color:var(--grn);font-size:16px;margin-top:22px}
+.band{padding:32px 34px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin:16px 0 64px;flex-wrap:wrap}
+.band h3{font-family:'PS2P';font-size:16px;line-height:1.5;text-shadow:3px 3px 0 var(--shadow)}
+.band p{color:var(--dim);margin-top:12px;font-size:20px}
+footer{border-top:3px solid var(--line);padding:26px 0}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.foot .links{font-size:8px}
+@media(max-width:820px){.hero{grid-template-columns:1fr}.viz{height:300px}.strip{grid-template-columns:1fr 1fr}.body{grid-template-columns:1fr}.main{border-right:none;border-bottom:3px solid var(--line)}.loop{flex-wrap:wrap}.arr{display:none}.step{flex:1 1 40%}h1{font-size:26px}}
+</style></head><body>
 
-    <main>
-      <section class="kpis">
-        <div class="kpi">
-          <span class="kpi-label">Flywheel value</span>
-          <span id="flywheelValue" class="kpi-value">$0.00</span>
-          <span class="kpi-sub">portfolio + reserve</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Return</span>
-          <span id="return" class="kpi-value">$0.00</span>
-          <span id="returnPct" class="kpi-sub">0.00%</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Spare change captured</span>
-          <span id="captured" class="kpi-value">$0.00</span>
-          <span class="kpi-sub">from round-ups</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Yield earned</span>
-          <span id="yield" class="kpi-value accent">$0.0000</span>
-          <span id="apy" class="kpi-sub">—</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Card offset</span>
-          <span id="offset" class="kpi-value">$0.00</span>
-          <span class="kpi-sub">auto-repaid from yield</span>
-        </div>
-      </section>
+<div class="nav"><div class="wrap navin">
+ <div class="brand"><span class="ic"><canvas id="coinNav" width="22" height="22"></canvas></span>
+  <div><b>FLYWHEEL</b><span>ON ROBINHOOD</span></div></div>
+ <div class="links"><a href="#how">PRODUCT</a><a href="#how">HOW IT WORKS</a><a href="#how">SECURITY</a><a href="#how">DOCS</a></div>
+ <div class="navb"><a class="btn alt sm" href="./app.html">LOG IN</a><a class="btn sm" href="./app.html">LAUNCH ▸</a></div>
+</div></div>
 
-      <section class="card wide">
-        <div class="card-head">
-          <h2>Performance</h2>
-          <span class="hint">live · this session</span>
-        </div>
-        <div class="charts-row">
-          <div class="chart-box">
-            <div class="chart-title">Flywheel value vs contributed</div>
-            <canvas id="lineChart" width="760" height="220"></canvas>
-            <div class="legend">
-              <span><i class="sw accent"></i>Flywheel value</span>
-              <span><i class="sw blue"></i>Contributed</span>
-            </div>
-          </div>
-          <div class="chart-box narrow">
-            <div class="chart-title">Basket allocation</div>
-            <canvas id="allocChart" width="240" height="220"></canvas>
-            <div id="allocLegend" class="legend wrap"></div>
-          </div>
-        </div>
-      </section>
+<div class="wrap">
+ <section class="hero">
+  <div>
+   <span class="tag"><span class="b"></span> 100% ON ROBINHOOD NETWORK</span>
+   <h1>YOUR DEFI<br><span class="green">FLYWHEEL</span><br>ON ROBINHOOD</h1>
+   <p class="lead">The first self-sustaining yield engine. Spend, round-up, invest, earn, repeat — pixel by pixel.</p>
+   <div class="cta"><a class="btn" href="./app.html">LAUNCH APP ▸</a><a class="btn alt" href="#how">HOW IT WORKS</a></div>
+  </div>
+  <div class="viz"><canvas id="coinBig" width="150" height="150"></canvas></div>
+ </section>
 
-      <section class="card wide">
-        <div class="card-head"><h2>The loop</h2><span class="hint">spend → invest → yield → repay</span></div>
-        <div class="loop">
-          <div class="node" data-node="spend">
-            <span class="node-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>
-            </span>
-            <b>Spend</b><small id="fSpent">$0</small>
-          </div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
-          <div class="node" data-node="roundup">
-            <span class="node-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14" /><path d="m18 13-6-6-6 6" /><path d="M12 7v14" /></svg>
-            </span>
-            <b>Round-up</b><small id="fMult">×—</small>
-          </div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
-          <div class="node" data-node="invest">
-            <span class="node-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17" /><path d="M16 7h6v6" /></svg>
-            </span>
-            <b>Invest</b><small id="fInvested">$0</small>
-          </div>
-          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></div>
-          <div class="node" data-node="yield">
-            <span class="node-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" /><path d="M18.09 10.37A6 6 0 1 1 10.34 18" /><path d="M7 6h1v4" /><path d="m16.71 13.88.7.71-2.82 2.82" /></svg>
-            </span>
-            <b>DeFi yield</b><small id="fApy">—</small>
-          </div>
-          <div class="arrow return"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10 4 15l5 5" /><path d="M20 4v7a4 4 0 0 1-4 4H4" /></svg></div>
-          <div class="node" data-node="repay">
-            <span class="node-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><path d="M2 10h20" /></svg>
-            </span>
-            <b>Auto-repay</b><small id="fRepaid">$0</small>
-          </div>
-        </div>
-      </section>
+ <div class="strip">
+  <div class="panel stat"><div class="v">$12.4M</div><div class="l">COMPOUNDED</div></div>
+  <div class="panel stat"><div class="v">+5.2K</div><div class="l">USERS GROWING</div></div>
+  <div class="panel stat"><div class="v w">6.0%</div><div class="l">AVG DEFI APY</div></div>
+  <div class="panel stat"><div class="v w">100%</div><div class="l">ON ROBINHOOD</div></div>
+ </div>
 
-      <div class="grid">
-        <section class="card">
-          <div class="card-head"><h2>Guardrails</h2><span class="hint">enforced by the agent</span></div>
-          <ul id="guardrails" class="guardrails"></ul>
-        </section>
+ <section class="sec">
+  <div class="panel win">
+   <div class="bar"><div class="l"><span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span> OVERVIEW.EXE</div><div class="l gold">● LIVE</div></div>
+   <div class="body">
+    <div class="main">
+     <div class="lab">FLYWHEEL VALUE</div>
+     <div class="big">$4,812.60</div>
+     <div class="up">▲ $286.40 · 6.32% THIS SESSION</div>
+     <svg id="bars" viewBox="0 0 560 150" width="100%" height="150" style="margin-top:16px"></svg>
+    </div>
+    <div class="kpi">
+     <div class="cell"><div class="lab">SPARE CHANGE</div><div class="v">$4,526</div></div>
+     <div class="cell"><div class="lab">YIELD EARNED</div><div class="v green">$38.94</div></div>
+     <div class="cell"><div class="lab">CARD REPAID</div><div class="v">$212</div></div>
+     <div class="cell"><div class="lab">RETURN</div><div class="v green">+6.32%</div></div>
+    </div>
+   </div>
+  </div>
+ </section>
 
-        <section class="card">
-          <div class="card-head"><h2>Tokenized basket</h2><span id="basketName" class="hint">—</span></div>
-          <table class="holdings">
-            <thead><tr><th>Token</th><th>Price</th><th>Shares</th><th>Value</th></tr></thead>
-            <tbody id="holdings"></tbody>
-          </table>
-        </section>
+ <section class="sec" id="how" style="padding-top:10px">
+  <div class="kick">HOW IT WORKS</div>
+  <div class="h2">ONE LOOP. INFINITE COMPOUND.</div>
+  <div class="loop">
+   <div class="step"><div class="tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/></svg></div><div class="no">01</div><h3>SPEND</h3><p>Use your Robinhood card like normal.</p></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10"/><path d="M4 7l4-4 4 4"/></svg></div><div class="no">02</div><h3>ROUND-UP</h3><p>Agent grabs the spare change, up to x5.</p></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/><path d="M11 5h3v3"/></svg></div><div class="no">03</div><h3>INVEST</h3><p>Into a tokenized-stock basket on-chain.</p></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M6 8h4"/><path d="M8 6v4"/></svg></div><div class="no">04</div><h3>YIELD</h3><p>Reserve earns DeFi yield on-chain.</p></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/><path d="M5 11l-2-2 2-2"/></svg></div><div class="no">05</div><h3>REPAY</h3><p>Yield repays the card. Loop closes.</p></div>
+  </div>
+ </section>
 
-        <section class="card">
-          <div class="card-head"><h2>Pending approvals</h2><span class="hint">high-value deployments</span></div>
-          <div id="approvals" class="approvals"><p class="empty">Nothing waiting.</p></div>
-        </section>
+ <div class="panel band">
+  <div><h3>BUILT FOR ROBINHOOD.<br>BUILT TO COMPOUND.</h3><p>Turn everyday spending into a self-sustaining engine.</p></div>
+  <a class="btn" href="./app.html">LAUNCH ▸</a>
+ </div>
+</div>
 
-        <section class="card">
-          <div class="card-head"><h2>On-chain activity</h2><span id="txCount" class="hint">0 tx</span></div>
-          <ul id="log" class="log"></ul>
-        </section>
-      </div>
-    </main>
+<footer><div class="wrap foot">
+ <div class="brand"><span class="ic"><canvas id="coinFoot" width="22" height="22"></canvas></span><div><b>FLYWHEEL</b><span>ON ROBINHOOD</span></div></div>
+ <div class="links"><a>DOCS</a><a>SECURITY</a><a>PRIVACY</a><a>TERMS</a></div>
+</div></footer>
 
-    <script type="module" src="./app.js"></script>
-  </body>
-</html>
+<script>
+function drawCoin(cv,N){
+ const ctx=cv.getContext('2d');const S=cv.width/N;const c=(N-1)/2;ctx.clearRect(0,0,cv.width,cv.height);
+ const P=(x,y,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x*S),Math.round(y*S),Math.ceil(S),Math.ceil(S));};
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);
+  if(d>N/2-0.5)continue;
+  if(d>N/2-2.2){P(x,y,'#1f7a45');continue;}
+  if(d>N/2-3.6){P(x,y,'#39ff88');continue;}
+  P(x,y,(dx+dy<-1)?'#1a3a24':'#123018');}
+ const leaf=[[-1,-3],[0,-3],[0,-2],[1,-2],[-1,-1],[0,-1],[1,-1],[2,-1],[-2,0],[-1,0],[0,0],[1,0],[-2,1],[-1,1],[0,1],[-2,2],[-1,2],[-1,3]];
+ leaf.forEach(([x,y])=>P(c+x,c+y,'#9dffc4'));
+ P(c-3,c-4,'#eafff0');P(c-4,c-3,'#eafff0');
+}
+[['coinBig',18],['coinNav',11],['coinFoot',11]].forEach(([id,n])=>{const el=document.getElementById(id);if(el)drawCoin(el,n);});
+(function(){const s=document.getElementById('bars');if(!s)return;const NS='http://www.w3.org/2000/svg';
+ const vals=[18,22,20,28,34,30,44,52,48,62,70,66,82,96,90,112,124,140];const W=560,H=150,bw=W/vals.length;const max=Math.max(...vals);
+ vals.forEach((v,i)=>{const h=v/max*(H-14);const x=i*bw+3;const y=H-h;
+  const r=document.createElementNS(NS,'rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',bw-6);r.setAttribute('height',h);r.setAttribute('fill','#1f7a45');r.setAttribute('shape-rendering','crispEdges');s.appendChild(r);
+  const cap=document.createElementNS(NS,'rect');cap.setAttribute('x',x);cap.setAttribute('y',y);cap.setAttribute('width',bw-6);cap.setAttribute('height',5);cap.setAttribute('fill','#39ff88');cap.setAttribute('shape-rendering','crispEdges');s.appendChild(cap);});
+})();
+</script>
+</body></html>

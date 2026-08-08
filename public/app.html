@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Flywheel — Live Agent · Robinhood network</title>
+<link rel="stylesheet" href="./pixel.css"/>
+<style>
+:root{
+ --bg:#0a0f0a; --panel:#0f170f; --panel2:#122012; --ink:#e9ffe9; --dim:#7fb98f; --mut:#5c8a6b;
+ --grn:#39ff88; --grn-d:#1f7a45; --gold:#ffd23f; --pink:#ff5fa2; --line:#2b4a30; --shadow:#040704;
+}
+*{box-sizing:border-box;margin:0}
+html{image-rendering:pixelated}
+body{font-family:'VT',monospace;background:var(--bg);color:var(--ink);font-size:19px;line-height:1.35;letter-spacing:.5px;position:relative}
+body:before{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+body:after{content:"";position:fixed;inset:0;z-index:99;pointer-events:none;background:radial-gradient(120% 120% at 50% 40%,transparent 62%,rgba(0,0,0,.5))}
+canvas{image-rendering:pixelated}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:inherit;text-decoration:none}
+.green{color:var(--grn)}.gold{color:var(--gold)}.pink{color:var(--pink)}
+.panel{background:var(--panel);border:3px solid var(--grn-d);box-shadow:6px 6px 0 var(--shadow);position:relative}
+.btn{font-family:'PS2P';font-size:9px;padding:11px 13px;border:3px solid #0a0f0a;cursor:pointer;background:var(--grn);color:#062412;box-shadow:4px 4px 0 var(--shadow);display:inline-flex;align-items:center;gap:7px;text-transform:uppercase}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
+.btn.alt{background:var(--panel2);color:var(--grn);border-color:var(--grn-d)}
+.btn.on{background:var(--gold);color:#3a2c00}
+
+/* topbar */
+.top{border-bottom:3px solid var(--line);background:#0a0f0a;position:sticky;top:0;z-index:30}
+.topin{display:flex;align-items:center;justify-content:space-between;height:70px;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .ic{width:32px;height:32px;background:var(--panel2);border:3px solid var(--grn-d);display:grid;place-items:center}
+.brand .ic canvas{width:20px;height:20px}
+.brand b{font-family:'PS2P';font-size:12px}
+.brand .pill{font-family:'PS2P';font-size:7px;color:var(--gold);border:2px solid var(--grn-d);padding:4px 7px;margin-left:6px}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap}
+.home{font-family:'PS2P';font-size:8px;color:var(--dim)}
+
+main{padding:22px 0 60px}
+.eyebrow{font-family:'PS2P';font-size:7px;color:var(--dim);letter-spacing:.5px;line-height:1.6}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kcard{padding:15px}
+.kval{font-size:32px;line-height:1;margin-top:9px}
+.ksub{font-size:15px;color:var(--mut);margin-top:6px}
+/* window */
+.win{margin-bottom:16px}
+.wbar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--panel2);border-bottom:3px solid var(--grn-d)}
+.wbar .l{font-family:'PS2P';font-size:9px;display:flex;gap:10px;align-items:center}
+.dots{display:flex;gap:6px}.dots i{width:11px;height:11px;display:block;border:2px solid #0a0f0a}
+.dots .r{background:var(--pink)}.dots .y{background:var(--gold)}.dots .g{background:var(--grn)}
+.wbody{display:grid;grid-template-columns:1.55fr 1fr}
+.chartcol{padding:20px;border-right:3px solid var(--line)}
+.chartcol .lab{font-family:'PS2P';font-size:8px;color:var(--dim)}
+.chartcol .big{font-size:50px;line-height:.9;margin-top:10px}
+.chartcol .up{font-size:18px;margin-top:6px}
+#barCanvas{width:100%;height:170px;margin-top:14px;display:block}
+.alloccol{padding:18px 20px}
+.alloccol h4{font-family:'PS2P';font-size:8px;color:var(--dim);margin-bottom:14px}
+.arow{margin-bottom:12px}
+.arow .t{display:flex;justify-content:space-between;font-size:16px;margin-bottom:4px}
+.abar{height:14px;background:#0c150c;border:2px solid var(--line)}
+.abar span{display:block;height:100%;background:var(--grn)}
+/* loop */
+.loopcard{padding:20px}
+.loop{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.step{flex:1;text-align:center}
+.tile{width:60px;height:60px;margin:0 auto;background:var(--panel2);border:3px solid var(--grn-d);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center;color:var(--grn);transition:transform .1s}
+.tile svg{width:26px;height:26px;shape-rendering:crispEdges}
+.tile.flash{background:var(--grn);color:#062412;transform:translateY(-3px)}
+.step h3{font-family:'PS2P';font-size:8px;margin-top:12px}
+.step small{display:block;color:var(--gold);font-size:15px;margin-top:5px}
+.arr{align-self:center;font-family:'PS2P';color:var(--grn);font-size:12px;margin-top:16px;opacity:.6}
+/* grid bottom */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.pad{padding:18px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.head h2{font-family:'PS2P';font-size:10px}
+.head .hint{font-family:'PS2P';font-size:7px;color:var(--dim)}
+.guard{list-style:none;padding:0;margin:0}
+.guard li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:2px solid var(--line);color:var(--dim);font-size:17px}
+.guard li:last-child{border:none}
+.guard b{color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{text-align:right;font-family:'PS2P';font-size:7px;color:var(--dim);font-weight:400;padding:0 4px 12px;border-bottom:2px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:9px 4px;border-bottom:2px solid #14201480}
+tr:last-child td{border:none}
+.tk{color:var(--grn)}
+.approvals .empty,.log .empty{color:var(--mut);font-size:16px}
+.appr{border:2px solid var(--gold);padding:12px;margin-bottom:10px}
+.appr p{font-size:16px;margin-bottom:10px}
+.appr .row{display:flex;gap:8px}
+.log{list-style:none;padding:0;margin:0;max-height:280px;overflow-y:auto}
+.log li{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:center;padding:8px 0;border-bottom:2px solid #14201466;font-size:15px}
+.log .d{width:8px;height:8px}
+.log .spend .d{background:var(--pink)}.log .invest .d{background:var(--grn)}.log .defi .d{background:var(--gold)}
+.log .repay .d{background:#9d7bff}.log .approval .d{background:var(--gold)}.log .agent .d{background:var(--mut)}
+.log .t{color:var(--mut);font-size:13px;white-space:nowrap}
+.tx{color:var(--mut);font-size:12px}
+.log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line)}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.wbody{grid-template-columns:1fr}.chartcol{border-right:none;border-bottom:3px solid var(--line)}.grid{grid-template-columns:1fr}.loop{flex-wrap:wrap}.arr{display:none}.step{flex:1 1 30%}}
+</style></head><body>
+
+<div class="top"><div class="wrap topin">
+ <div class="brand"><span class="ic"><canvas id="coinNav" width="20" height="20"></canvas></span>
+  <b>FLYWHEEL</b><span id="mode" class="pill">SIMULATION</span></div>
+ <div class="ctrls">
+  <a class="home btn alt" href="./index.html">◂ HOME</a>
+  <button id="btnSpend" class="btn alt">+ SPEND</button>
+  <button id="btnAuto" class="btn">▸ AUTOPILOT</button>
+  <button id="btnRepay" class="btn alt">$ REPAY</button>
+ </div>
+</div></div>
+
+<main class="wrap">
+ <div class="kpis">
+  <div class="panel kcard"><div class="eyebrow">FLYWHEEL VALUE</div><div id="kFlywheel" class="kval">$0.00</div><div class="ksub">PORTFOLIO + RESERVE</div></div>
+  <div class="panel kcard"><div class="eyebrow">RETURN</div><div id="kReturn" class="kval green">$0.00</div><div id="kReturnSub" class="ksub">0.00%</div></div>
+  <div class="panel kcard"><div class="eyebrow">SPARE CHANGE</div><div id="kCaptured" class="kval">$0.00</div><div class="ksub">FROM ROUND-UPS</div></div>
+  <div class="panel kcard"><div class="eyebrow">YIELD EARNED</div><div id="kYield" class="kval green">$0.0000</div><div id="kApy" class="ksub">—</div></div>
+  <div class="panel kcard"><div class="eyebrow">CARD OFFSET</div><div id="kOffset" class="kval">$0.00</div><div class="ksub">AUTO-REPAID</div></div>
+ </div>
+
+ <div class="panel win">
+  <div class="wbar"><div class="l"><span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span> OVERVIEW.EXE</div><div class="l gold">● LIVE</div></div>
+  <div class="wbody">
+   <div class="chartcol">
+    <div class="lab">FLYWHEEL VALUE</div>
+    <div id="bigVal" class="big">$0.00</div>
+    <div id="bigDelta" class="up green">▲ $0.00 · 0.00% THIS SESSION</div>
+    <canvas id="barCanvas" width="600" height="170"></canvas>
+   </div>
+   <div class="alloccol">
+    <h4>BASKET ALLOCATION</h4>
+    <div id="alloc"></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="panel loopcard">
+  <div class="loop">
+   <div class="step"><div class="tile" data-node="spend"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/></svg></div><h3>SPEND</h3><small id="lSpend">$0</small></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile" data-node="roundup"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10"/><path d="M4 7l4-4 4 4"/></svg></div><h3>ROUND-UP</h3><small id="lMult">×—</small></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile" data-node="invest"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/><path d="M11 5h3v3"/></svg></div><h3>INVEST</h3><small id="lInvest">$0</small></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile" data-node="yield"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M6 8h4"/><path d="M8 6v4"/></svg></div><h3>YIELD</h3><small id="lApy">—</small></div>
+   <div class="arr">▸</div>
+   <div class="step"><div class="tile" data-node="repay"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="9"/><path d="M2 7h12"/><path d="M5 11l-2-2 2-2"/></svg></div><h3>REPAY</h3><small id="lRepay">$0</small></div>
+  </div>
+ </div>
+
+ <div class="grid">
+  <div class="panel pad"><div class="head"><h2>GUARDRAILS</h2><span class="hint">ENFORCED</span></div><ul id="guard" class="guard"></ul></div>
+  <div class="panel pad"><div class="head"><h2>BASKET</h2><span id="basketName" class="hint">—</span></div>
+   <table><thead><tr><th>TOKEN</th><th>PRICE</th><th>SHARES</th><th>VALUE</th></tr></thead><tbody id="holdings"></tbody></table></div>
+  <div class="panel pad"><div class="head"><h2>APPROVALS</h2><span class="hint">HIGH-VALUE</span></div><div id="approvals" class="approvals"><p class="empty">NOTHING WAITING.</p></div></div>
+  <div class="panel pad"><div class="head"><h2>ON-CHAIN LOG</h2><span id="txCount" class="hint">0 TX</span></div><ul id="log" class="log"></ul></div>
+ </div>
+</main>
+
+<script>
+// nav coin sprite
+(function(){const cv=document.getElementById('coinNav');if(!cv)return;const N=10,ctx=cv.getContext('2d'),S=cv.width/N,c=(N-1)/2;
+ const P=(x,y,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x*S),Math.round(y*S),Math.ceil(S),Math.ceil(S));};
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);if(d>N/2-0.5)continue;
+  if(d>N/2-1.6){P(x,y,'#1f7a45');continue;}P(x,y,'#123018');}
+ [[-1,-2],[0,-2],[0,-1],[1,-1],[-1,0],[0,0],[-1,1],[-1,2]].forEach(([x,y])=>P(c+x,c+y,'#9dffc4'));
+})();
+</script>
+<script type="module" src="./app.js"></script>
+</body></html>
