@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Olea — Live agent · Robinhood network</title>
+<title>olea · Live agent · Robinhood network</title>
 <link rel="icon" href="./olea-mark.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -107,7 +107,7 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
     <div class="kcard"><div class="k">Olea value</div><div id="kFlywheel" class="v num">$0.00</div><div class="s">portfolio + reserve</div></div>
     <div class="kcard"><div class="k">Return</div><div id="kReturn" class="v num accent">$0.00</div><div id="kReturnSub" class="s accent">0.00%</div></div>
     <div class="kcard"><div class="k">Spare change</div><div id="kCaptured" class="v num">$0.00</div><div class="s">from round-ups</div></div>
-    <div class="kcard"><div class="k">Yield earned</div><div id="kYield" class="v num accent">$0.0000</div><div id="kApy" class="s">—</div></div>
+    <div class="kcard"><div class="k">Yield earned</div><div id="kYield" class="v num accent">$0.0000</div><div id="kApy" class="s">·</div></div>
     <div class="kcard"><div class="k">Card offset</div><div id="kOffset" class="v num">$0.00</div><div class="s">auto-repaid</div></div>
   </div>
 
@@ -122,7 +122,7 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
       </div>
     </div>
     <div class="panel">
-      <div class="p-head"><h2>Basket allocation</h2><span id="basketName" class="hint">—</span></div>
+      <div class="p-head"><h2>Basket allocation</h2><span id="basketName" class="hint">·</span></div>
       <div class="alloc-body">
         <canvas id="allocCanvas" width="190" height="190"></canvas>
         <div id="allocLegend" class="alloc-legend"></div>
@@ -135,11 +135,11 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
     <div class="loop">
       <div class="step"><div class="tile" data-node="spend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><h4>Spend</h4><small id="lSpend">$0</small></div>
       <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
-      <div class="step"><div class="tile" data-node="roundup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14"/><path d="m18 13-6-6-6 6"/><path d="M12 7v14"/></svg></div><h4>Round-up</h4><small id="lMult">×—</small></div>
+      <div class="step"><div class="tile" data-node="roundup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14"/><path d="m18 13-6-6-6 6"/><path d="M12 7v14"/></svg></div><h4>Round-up</h4><small id="lMult">×5</small></div>
       <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
       <div class="step"><div class="tile" data-node="invest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg></div><h4>Invest</h4><small id="lInvest">$0</small></div>
       <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
-      <div class="step"><div class="tile" data-node="yield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6"/><path d="M12 9v6"/></svg></div><h4>Yield</h4><small id="lApy">—</small></div>
+      <div class="step"><div class="tile" data-node="yield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6"/><path d="M12 9v6"/></svg></div><h4>Yield</h4><small id="lApy">·</small></div>
       <div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10 4 15l5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></div>
       <div class="step"><div class="tile" data-node="repay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="m7 15-2-2 2-2"/></svg></div><h4>Auto-repay</h4><small id="lRepay">$0</small></div>
     </div>
@@ -147,7 +147,7 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
 
   <div class="grid2">
     <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Guardrails</h2><span class="hint">enforced by the agent</span></div><ul id="guard" class="guard" style="margin-top:6px"></ul></div>
-    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Tokenized basket</h2><span id="basketName2" class="hint">—</span></div>
+    <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Tokenized basket</h2><span id="basketName2" class="hint">·</span></div>
       <table style="margin-top:6px"><thead><tr><th>Token</th><th>Price</th><th>Shares</th><th>Value</th></tr></thead><tbody id="holdings"></tbody></table></div>
     <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>Pending approvals</h2><span class="hint">high-value</span></div><div id="approvals" style="margin-top:12px"><p class="empty">Nothing waiting.</p></div></div>
     <div class="panel pad"><div class="p-head" style="padding:0 0 14px;border-bottom:1px solid var(--line)"><h2>On-chain activity</h2><span id="txCount" class="hint">0 tx</span></div><ul id="log" class="log" style="margin-top:12px"></ul></div>

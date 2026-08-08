@@ -157,7 +157,7 @@ class Agent {
     this._roll();
     const g = this.g;
     if (this.investedToday >= g.dailyInvestCapUsd)
-      return { action: "skip", reason: `daily invest cap $${g.dailyInvestCapUsd} reached — holding` };
+      return { action: "skip", reason: `daily invest cap $${g.dailyInvestCapUsd} reached, holding` };
 
     let investAmt = r2(roundUpAmt * (1 - this.reserveRatio));
     const reserveAmt = r2(roundUpAmt - investAmt);
@@ -179,7 +179,7 @@ class Agent {
       ticker,
       investAmt,
       reserveAmt,
-      reason: `${ticker} most underweight — buying $${investAmt.toFixed(2)}, reserving $${reserveAmt.toFixed(2)}`,
+      reason: `${ticker} most underweight, buying $${investAmt.toFixed(2)}, reserving $${reserveAmt.toFixed(2)}`,
     };
   }
   recordInvested(usd) {
@@ -189,7 +189,7 @@ class Agent {
     const buf = this.g.minCardBufferUsd;
     if (cardBalance <= 0) return { action: "skip", reason: "no card balance due" };
     const payable = Math.max(0, r2(reserveBalance - buf));
-    if (payable <= 0) return { action: "skip", reason: `reserve below $${buf} buffer — deferring` };
+    if (payable <= 0) return { action: "skip", reason: `reserve below $${buf} buffer, deferring` };
     const pay = Math.min(payable, cardBalance);
     return { action: "repay", amount: r2(pay), reason: `auto-repaying $${pay.toFixed(2)} from yield reserve` };
   }
@@ -247,7 +247,7 @@ export class Flywheel {
     if (plan.action === "needs_approval") {
       const item = { id: `apr_${Date.now()}_${this._seq}`, ...plan };
       this.pendingApprovals.push(item);
-      return this._record("approval", `Needs approval — ${plan.reason}`, { approvalId: item.id });
+      return this._record("approval", `Needs approval, ${plan.reason}`, { approvalId: item.id });
     }
     this._execInvest(plan);
   }
