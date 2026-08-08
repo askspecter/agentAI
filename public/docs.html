@@ -3,60 +3,117 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Docs · olea</title>
-<link rel="icon" href="./favicon.png"/>
-<link rel="icon" sizes="32x32" href="./favicon-32.png"/>
-<link rel="apple-touch-icon" href="./apple-touch-icon.png"/>
+<meta name="description" content="How Olea works: the flywheel, the tokenized-stock basket, DeFi yield, guardrails, and the architecture behind the agent."/>
+<link rel="icon" href="/favicon.png"/>
+<link rel="icon" sizes="32x32" href="/favicon-32.png"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"/>
-<link rel="stylesheet" href="./styles.css"/>
+<link rel="stylesheet" href="/styles.css"/>
 </head><body>
 <header class="nav"><div class="container nav-in">
-  <a class="brand" href="./index.html"><img src="./olea-mark.png" alt="olea"/><span class="name">olea</span></a>
-  <div class="nav-cta"><a class="btn btn-sm" href="./index.html">← Back</a><a class="btn btn-primary btn-sm" href="./app.html">Launch app →</a></div>
+  <a class="brand" href="/"><img src="/olea-mark.png" alt="olea"/><span class="name">olea</span></a>
+  <div class="nav-cta"><a class="btn btn-sm" href="/">← Back</a><a class="btn btn-primary btn-sm" href="/app">Launch app →</a></div>
 </div></header>
 
-<main class="page prose">
-  <a class="kicker-link" href="./index.html">← Home</a>
-  <h1>Docs</h1>
-  <div class="updated">How Olea works, end to end</div>
+<div class="doc-wrap">
+  <nav class="toc">
+    <div class="toc-title">On this page</div>
+    <a href="#overview">Overview</a>
+    <a href="#loop">The flywheel loop</a>
+    <a href="#basket">Tokenized-stock basket</a>
+    <a href="#yield">DeFi yield &amp; the reserve</a>
+    <a href="#repay">Auto-repay</a>
+    <a href="#agent">The agent’s logic</a>
+    <a href="#guardrails">Guardrails</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#integration">Going live</a>
+    <a href="#faq">FAQ</a>
+  </nav>
 
-  <h2>What is Olea?</h2>
-  <p>Olea is an autonomous agent on the Robinhood network that turns everyday card spending into a self-sustaining flywheel: it rounds up each purchase, invests the spare change in tokenized stocks on-chain, earns DeFi yield on the idle reserve, and uses that yield to auto-repay your card.</p>
+  <main class="doc-main prose">
+    <a class="kicker-link" href="/">← Home</a>
+    <h1>Documentation</h1>
+    <div class="updated">A complete guide to how Olea works, end to end.</div>
 
-  <h2>The loop</h2>
-  <ul>
-    <li><strong>Spend.</strong> Use your Robinhood card as normal.</li>
-    <li><strong>Round-up.</strong> The agent captures the spare change, up to 5×.</li>
-    <li><strong>Invest.</strong> The change is deployed into a tokenized-stock basket on Robinhood Chain, always nudging toward your target weights.</li>
-    <li><strong>Earn yield.</strong> A reserve slice sits in a DeFi pool earning yield between buys.</li>
-    <li><strong>Auto-repay.</strong> Yield is swept back to pay down the card, closing the loop so your principal keeps working.</li>
-  </ul>
+    <h2 id="overview">Overview</h2>
+    <p>Olea is an autonomous agent on the Robinhood network that turns everyday card spending into a self-sustaining investment flywheel. You keep spending exactly as you do today. Behind the scenes, Olea rounds up each purchase, invests the spare change into a basket of tokenized stocks on Robinhood Chain, earns DeFi yield on the idle reserve, and uses that yield to quietly pay down your card, so your invested principal keeps compounding.</p>
+    <p>The whole thing is designed to be <strong>hands-off but never unchecked</strong>: the agent operates inside a dedicated, funded account with hard limits you configure, and every action settles on-chain for a transparent, verifiable record.</p>
+    <div class="callout"><strong>Note:</strong> The app you can launch from this site is a fully client-side simulation. It demonstrates the mechanics safely and does not place real orders or move real funds.</div>
 
-  <h2>Guardrails</h2>
-  <p>The agent runs inside a dedicated, funded account and can only ever touch what you allow:</p>
-  <ul>
-    <li>Round-up multiplier and a minimum card buffer</li>
-    <li>Per-trade cap and daily invest cap</li>
-    <li>A manual-approval threshold for large deployments</li>
-    <li>On-chain settlement for a verifiable, real-time record</li>
-  </ul>
+    <h2 id="loop">The flywheel loop</h2>
+    <p>Olea runs a single closed loop. Each turn moves a little more of your spare change into productive assets and recycles the returns:</p>
+    <ol>
+      <li><strong>Spend.</strong> You use your Robinhood card anywhere, like normal. Each purchase emits a transaction event that Olea listens for.</li>
+      <li><strong>Round-up.</strong> The agent rounds the purchase up to the next dollar and multiplies the difference by your chosen multiplier (up to 5×). A $4.30 coffee at 5× captures $3.50 of spare change.</li>
+      <li><strong>Invest.</strong> Most of the captured change is deployed into a tokenized-stock basket on Robinhood Chain, always buying whichever holding is furthest below its target weight.</li>
+      <li><strong>Earn yield.</strong> A reserve slice is parked in a DeFi pool where it earns yield between buys.</li>
+      <li><strong>Auto-repay.</strong> When your statement comes due, accrued yield is swept from the reserve to pay down the card, closing the loop.</li>
+    </ol>
+    <p>Because the output of each step feeds the next, small, frequent contributions compound over time. That is the flywheel.</p>
 
-  <h2>Architecture</h2>
-  <p>The live app is a fully client-side simulation, so it runs on any static host with no backend. The simulation engine models a price feed, the tokenized-stock positions, the DeFi yield reserve, and the agent’s decisions.</p>
-  <p>For a real deployment, the codebase keeps clearly-marked integration seams:</p>
-  <ul>
-    <li><strong>Trading MCP</strong>: routes real orders through Robinhood’s Agentic Account.</li>
-    <li><strong>Robinhood Chain</strong>: settlement of tokenized-stock buys and DeFi yield.</li>
-    <li><strong>Card webhook</strong>: the inbound feed of card purchases that starts the loop.</li>
-  </ul>
+    <h2 id="basket">Tokenized-stock basket</h2>
+    <p>Your invested change buys into a themed basket of tokenized stocks that settle on Robinhood Chain. The default “AI Megacap” basket targets a weighting across large-cap names, but the concept generalizes to any set of target weights.</p>
+    <ul>
+      <li><strong>Fractional by design.</strong> Round-ups are small, so every buy is fractional. Tokenization makes sub-dollar positions practical.</li>
+      <li><strong>Drift-correcting.</strong> Rather than splitting every tiny deposit across every holding (which wastes fees), the agent directs each round-up to the single most underweight token, steadily pulling the basket back toward its targets.</li>
+      <li><strong>Transparent.</strong> Holdings, prices and share counts are visible in the app in real time, and each buy has an on-chain settlement record.</li>
+    </ul>
 
-  <h2>Try it</h2>
-  <p><a href="./app.html">Launch the app</a> and hit <strong>Autopilot</strong> to watch the loop run live. More questions? See the <a href="./index.html#faq">FAQ</a> or ping <a href="https://x.com/oleacash" target="_blank" rel="noopener">@oleacash</a>.</p>
+    <h2 id="yield">DeFi yield &amp; the reserve</h2>
+    <p>Not every dollar goes straight into stocks. A portion of each round-up is held back as a <strong>reserve</strong> and deposited into a DeFi pool on Robinhood Chain, where it earns a variable yield. The reserve does two jobs: it smooths out buying, and it builds the pool of yield that later repays your card. Yields are variable and are not guaranteed.</p>
 
-  <hr/>
-  <p>Olea is a prototype and is not affiliated with, sponsored by, or endorsed by Robinhood Markets, Inc.</p>
-</main>
+    <h2 id="repay">Auto-repay</h2>
+    <p>The reserve is what closes the loop. When there is enough yield-bearing balance above your minimum card buffer, the agent withdraws from the reserve and applies it to your outstanding card balance. The effect is a card that partly pays itself, funded by the returns on money you would otherwise have spent and forgotten.</p>
+
+    <h2 id="agent">The agent’s logic</h2>
+    <p>Every round-up runs through an explainable decision function. In plain terms, the agent:</p>
+    <ul>
+      <li>Checks your guardrails first. If the daily cap is reached, it holds. If a deployment exceeds the manual-approval threshold, it queues for your explicit OK instead of executing.</li>
+      <li>Splits the round-up into an <strong>invest</strong> slice and a <strong>reserve</strong> slice.</li>
+      <li>Chooses the most underweight basket token and buys the invest slice of it.</li>
+      <li>Deposits the reserve slice into the DeFi pool.</li>
+      <li>Records a human-readable reason for every action, so the activity log always explains what happened and why.</li>
+    </ul>
+
+    <h2 id="guardrails">Guardrails</h2>
+    <p>Autonomy is bounded by rules you set. The agent can only ever touch funds inside a dedicated account, and within that account it is constrained by:</p>
+    <ul>
+      <li><strong>Round-up multiplier</strong>: how aggressively spare change is captured.</li>
+      <li><strong>Per-trade cap</strong>: the largest single order the agent may place.</li>
+      <li><strong>Daily invest cap</strong>: the most that can be deployed in a day.</li>
+      <li><strong>Manual-approval threshold</strong>: deployments above this pause for your approval.</li>
+      <li><strong>Minimum card buffer</strong>: a floor the reserve is never drained below.</li>
+    </ul>
+    <div class="callout">Guardrails reduce risk; they do not remove it. See the <a href="/disclosures">Disclosures</a> for the full risk picture.</div>
+
+    <h2 id="architecture">Architecture</h2>
+    <p>The live demo is a fully client-side application, so it runs on any static host with no backend. The in-browser engine models four things:</p>
+    <ul>
+      <li>A <strong>market</strong> that ticks tokenized-stock prices.</li>
+      <li>A <strong>chain</strong> layer that holds tokenized positions and accrues DeFi yield on the reserve.</li>
+      <li>An <strong>agent</strong> that makes the deployment and repayment decisions above.</li>
+      <li>A <strong>card feed</strong> that generates purchases and computes round-ups.</li>
+    </ul>
+    <p>State lives only in your browser tab. Nothing is sent to a server.</p>
+
+    <h2 id="integration">Going live</h2>
+    <p>The codebase keeps clearly-marked seams for wiring the real Robinhood network in place of the simulation:</p>
+    <ul>
+      <li><strong>Trading MCP</strong>: routes real orders through Robinhood’s Agentic Account, the same guardrailed surface used for agent trading.</li>
+      <li><strong>Robinhood Chain</strong>: settlement of tokenized-stock buys and the DeFi reserve.</li>
+      <li><strong>Card webhook</strong>: the inbound feed of real card purchases that starts each loop.</li>
+    </ul>
+    <p>Each seam is a single, well-defined boundary, so the rest of the app never needs to know whether it is talking to the simulator or the real broker.</p>
+
+    <h2 id="faq">More questions</h2>
+    <p>See the <a href="/#faq">FAQ</a> on the home page, read the <a href="/disclosures">Disclosures</a>, or reach us on X at <a href="https://x.com/oleacash" target="_blank" rel="noopener">@oleacash</a>. Ready to see it move? <a href="/app">Launch the app</a> and hit Autopilot.</p>
+
+    <hr/>
+    <p>Olea is a prototype and is not affiliated with, sponsored by, or endorsed by Robinhood Markets, Inc.</p>
+  </main>
+</div>
 
 <footer class="footer"><div class="footer-bottom"><div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:16px;flex-wrap:wrap">
   <span>© 2026 olea · On the Robinhood network</span>

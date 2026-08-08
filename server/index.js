@@ -76,13 +76,19 @@ async function serveStatic(res, urlPath) {
     res.writeHead(403).end("forbidden");
     return;
   }
-  try {
-    const body = await readFile(file);
-    res.writeHead(200, { "Content-Type": MIME[extname(file)] || "application/octet-stream" });
-    res.end(body);
-  } catch {
-    res.writeHead(404).end("not found");
+  // clean-URL fallback: /docs -> docs.html (mirrors Vercel cleanUrls)
+  const candidates = extname(file) ? [file] : [file, file + ".html"];
+  for (const f of candidates) {
+    try {
+      const body = await readFile(f);
+      res.writeHead(200, { "Content-Type": MIME[extname(f)] || "application/octet-stream" });
+      res.end(body);
+      return;
+    } catch {
+      /* try next */
+    }
   }
+  res.writeHead(404).end("not found");
 }
 
 // ---- router --------------------------------------------------------------
