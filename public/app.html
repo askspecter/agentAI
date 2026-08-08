@@ -20,6 +20,9 @@
 .pill{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--olive);
   border:1px solid rgba(164,181,110,.3);background:var(--olive-soft);padding:3px 9px;border-radius:999px;margin-left:6px}
 .tb-ctrls{display:flex;gap:8px;flex-wrap:wrap}
+.userchip{display:inline-flex;align-items:center;gap:8px;margin-left:8px;padding:4px 12px 4px 5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;color:var(--muted);max-width:220px}
+.userchip .uava{width:22px;height:22px;border-radius:50%;background:var(--olive);color:#14180b;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;font-family:var(--display)}
+.userchip #uname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 .btn.on{background:var(--olive);color:#14180b;border-color:transparent}
 main{padding:22px 0 64px}
 
@@ -95,12 +98,14 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
 </style></head><body>
 
 <header class="topbar"><div class="container tb-in">
-  <div class="tb-brand"><img src="./olea-mark.png" alt="olea"/><span class="name">olea</span><span id="mode" class="pill">Simulation</span></div>
+  <div class="tb-brand"><img src="./olea-mark.png" alt="olea"/><span class="name">olea</span><span id="mode" class="pill">Simulation</span>
+    <span class="userchip" id="userchip"><span class="uava" id="uava">G</span><span id="uname">Guest</span></span></div>
   <div class="tb-ctrls">
     <a class="btn btn-sm" href="/">← Home</a>
     <button id="btnSpend" class="btn btn-sm">+ Simulate purchase</button>
     <button id="btnAuto" class="btn btn-primary btn-sm">▶ Autopilot</button>
     <button id="btnRepay" class="btn btn-sm">Auto-repay</button>
+    <a id="authBtn" class="btn btn-sm" href="/login">Log in</a>
   </div>
 </div></header>
 
@@ -156,5 +161,27 @@ tr:last-child td{border:none}.tk{color:var(--text);font-weight:600}
   </div>
 </main>
 
+<script>
+// Reflect the logged-in identity (set by /login) in the header.
+(function () {
+  var u = null;
+  try { u = localStorage.getItem("olea_user"); } catch (e) {}
+  var uname = document.getElementById("uname");
+  var uava = document.getElementById("uava");
+  var authBtn = document.getElementById("authBtn");
+  if (u) {
+    uname.textContent = u;
+    uava.textContent = (u.indexOf("@") > -1 ? u[0] : "0x1").slice(0, 1).toUpperCase();
+    uava.textContent = u.indexOf("0x") === 0 ? "⬡" : (u[0] || "?").toUpperCase();
+    authBtn.textContent = "Log out";
+    authBtn.setAttribute("href", "/login?logout=1");
+  } else {
+    uname.textContent = "Guest";
+    uava.textContent = "G";
+    authBtn.textContent = "Log in";
+    authBtn.setAttribute("href", "/login");
+  }
+})();
+</script>
 <script type="module" src="./app.js"></script>
 </body></html>

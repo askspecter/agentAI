@@ -8,22 +8,57 @@ import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 const h = React.createElement;
 const APP_ID = "cmsjzwzna00qi0cjv5ytexft3";
 
+// Human-readable identity: email if present, otherwise a shortened wallet.
+function displayFor(user) {
+  const accts = (user && user.linkedAccounts) || [];
+  const email =
+    (user && user.email && user.email.address) ||
+    (accts.find((a) => a.type === "email") || {}).address;
+  if (email) return email;
+  const wallet =
+    (user && user.wallet && user.wallet.address) ||
+    (accts.find((a) => a.type === "wallet") || {}).address;
+  if (wallet) return wallet.slice(0, 6) + "…" + wallet.slice(-4);
+  return "Account";
+}
+
+const isLogout = new URLSearchParams(window.location.search).has("logout");
+
 function Inner() {
-  const { ready, authenticated, login } = usePrivy();
+  const { ready, authenticated, user, login, logout } = usePrivy();
   const [busy, setBusy] = React.useState(false);
 
   React.useEffect(() => {
-    if (ready && authenticated) {
-      try { localStorage.setItem("olea_authed", "1"); } catch (e) {}
+    if (!ready) return;
+    if (isLogout) {
+      (async () => {
+        try { if (authenticated) await logout(); } catch (e) {}
+        try { localStorage.removeItem("olea_user"); localStorage.removeItem("olea_authed"); } catch (e) {}
+        window.location.replace("/");
+      })();
+      return;
+    }
+    if (authenticated) {
+      try {
+        localStorage.setItem("olea_authed", "1");
+        localStorage.setItem("olea_user", displayFor(user));
+      } catch (e) {}
       window.location.replace("/app");
     }
   }, [ready, authenticated]);
 
   React.useEffect(() => {
-    if (ready && !authenticated) { setBusy(true); try { login(); } catch (e) {} }
+    if (ready && !authenticated && !isLogout) { setBusy(true); try { login(); } catch (e) {} }
   }, [ready]);
 
   const onClick = () => { setBusy(true); try { login(); } catch (e) {} };
+
+  if (isLogout) {
+    return h("div", null,
+      h("div", { className: "mk" }, h("img", { src: "/olea-mark.png", alt: "olea" })),
+      h("h1", null, "Signing out…"),
+      h("p", { className: "sub" }, "Come back soon."));
+  }
 
   return h("div", null,
     h("div", { className: "mk" }, h("img", { src: "/olea-mark.png", alt: "olea" })),
